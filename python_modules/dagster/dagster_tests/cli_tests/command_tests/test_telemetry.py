@@ -191,14 +191,14 @@ def test_write_telemetry_log_line_writes_to_dagster_home():
     with tempfile.TemporaryDirectory() as temp_dir:
         with environ({"DAGSTER_HOME": temp_dir}):
             write_telemetry_log_line({"foo": "bar"})
-            with open(os.path.join(temp_dir, "logs/event.log"), "r") as f:
+            with open(os.path.join(temp_dir, "logs", "event.log"), "r") as f:
                 res = json.load(f)
                 assert res == {"foo": "bar"}
 
-            os.remove(os.path.join(temp_dir, "logs/event.log"))
+            os.remove(os.path.join(temp_dir, "logs", "event.log"))
             os.rmdir(os.path.join(temp_dir, "logs"))
 
             write_telemetry_log_line({"foo": "bar"})
-            with open(os.path.join(temp_dir, "logs/event.log"), "r") as f:
+            with open(os.path.join(temp_dir, "logs", "event.log"), "r") as f:
                 res = json.load(f)
                 assert res == {"foo": "bar"}
