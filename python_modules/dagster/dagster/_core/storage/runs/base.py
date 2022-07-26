@@ -188,6 +188,16 @@ class RunStorage(ABC, MayHaveInstanceWeakref):
             new_tags (Dict[string, string])
         """
 
+    #    @abstractmethod
+    # Need to fill in the other storage impls and think about back-compat
+    def add_execution_plan_snapshot_to_run(self, run_id: str, execution_plan_snapshot_id: str):
+        """Add additional tags for a pipeline run.
+
+        Args:
+            run_id (str)
+            execution_plan_snapshot_id (str)
+        """
+
     @abstractmethod
     def has_run(self, run_id: str) -> bool:
         """Check if the storage contains a run.

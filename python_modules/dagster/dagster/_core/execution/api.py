@@ -17,6 +17,7 @@ from dagster._core.execution.plan.state import KnownExecutionState
 from dagster._core.execution.retries import RetryMode
 from dagster._core.instance import DagsterInstance, InstanceRef
 from dagster._core.selector import parse_step_selection
+from dagster._core.snap.execution_plan_snapshot import snapshot_from_execution_plan
 from dagster._core.storage.pipeline_run import DagsterRun, PipelineRun, PipelineRunStatus
 from dagster._core.system_config.objects import ResolvedRunConfig
 from dagster._core.telemetry import log_repo_stats, telemetry_wrapper
@@ -756,13 +757,34 @@ def _get_execution_plan_from_run(
                 pipeline_run.pipeline_name,
                 execution_plan_snapshot,
             )
-    return create_execution_plan(
+
+    # Need better exception handling here - right now an error (e.g. referencing an env var that
+    # doesn't exist in the config) raises a "An exception was thrown during execution that is
+    # likely a framework error, rather than an error in user code." - before, it gave you a reasonably
+    # nice error experience right in the launchpad or scheduler tick, before any runs were created)
+    execution_plan = create_execution_plan(
         pipeline,
         run_config=pipeline_run.run_config,
         mode=pipeline_run.mode,
         step_keys_to_execute=pipeline_run.step_keys_to_execute,
         instance_ref=instance.get_ref() if instance.is_persistent else None,
     )
+
+    if not pipeline_run.execution_plan_snapshot_id:
+        # Frontend currently shows a scary "Unable to build execution plan" error, would need to
+        # be something like "creating execution plan..." (but it already auto-refreshes once we write it!)
+        snapshot = snapshot_from_execution_plan(execution_plan, pipeline_run.pipeline_snapshot_id)
+        snapshot_id = instance._ensure_persisted_execution_plan_snapshot(
+            snapshot,
+            pipeline_run.pipeline_snapshot_id,
+            pipeline_run.step_keys_to_execute,
+        )
+
+        # Dagit seems to automatically pick the snapshot up and start rendering the gantt
+        # chart automatically once this runs
+        instance.run_storage.add_execution_plan_snapshot_to_run(pipeline_run.run_id, snapshot_id)
+
+    return execution_plan
 
 
 def create_execution_plan(

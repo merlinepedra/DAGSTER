@@ -52,7 +52,9 @@ def is_resume_retry(execution_params):
     return execution_params.execution_metadata.tags.get(RESUME_RETRY_TAG) == "true"
 
 
-def create_valid_pipeline_run(graphene_info, external_pipeline, execution_params):
+def create_valid_pipeline_run(
+    graphene_info, external_pipeline, execution_params, include_execution_plan
+):
     if execution_params.mode is None and len(external_pipeline.available_modes) > 1:
         raise UserFacingGraphQLError(
             GrapheneNoModeProvidedError(external_pipeline.name, external_pipeline.available_modes)
@@ -69,19 +71,26 @@ def create_valid_pipeline_run(graphene_info, external_pipeline, execution_params
         graphene_info, execution_params
     )
 
-    external_execution_plan = get_external_execution_plan_or_raise(
-        graphene_info=graphene_info,
-        external_pipeline=external_pipeline,
-        mode=mode,
-        run_config=execution_params.run_config,
-        step_keys_to_execute=step_keys_to_execute,
-        known_state=known_state,
+    external_execution_plan = (
+        get_external_execution_plan_or_raise(
+            graphene_info=graphene_info,
+            external_pipeline=external_pipeline,
+            mode=mode,
+            run_config=execution_params.run_config,
+            step_keys_to_execute=step_keys_to_execute,
+            known_state=known_state,
+        )
+        if include_execution_plan
+        else None
     )
+
     tags = merge_dicts(external_pipeline.tags, execution_params.execution_metadata.tags)
 
     pipeline_run = graphene_info.context.instance.create_run(
         pipeline_snapshot=external_pipeline.pipeline_snapshot,
-        execution_plan_snapshot=external_execution_plan.execution_plan_snapshot,
+        execution_plan_snapshot=(
+            external_execution_plan.execution_plan_snapshot if external_execution_plan else None
+        ),
         parent_pipeline_snapshot=external_pipeline.parent_pipeline_snapshot,
         pipeline_name=execution_params.selector.pipeline_name,
         run_id=execution_params.execution_metadata.run_id
