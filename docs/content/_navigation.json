@@ -726,6 +726,10 @@
             "path": "/_apidocs/libraries/dagster-pandas"
           },
           {
+            "title": "Pandera (dagster-pandas)",
+            "path": "/_apidocs/libraries/dagster-pandas"
+          },
+          {
             "title": "Papertrail (dagster-papertrail)",
             "path": "/_apidocs/libraries/dagster-papertrail"
           },
