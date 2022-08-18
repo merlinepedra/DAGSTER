@@ -26,6 +26,7 @@ from starlette.types import Message
 import dagster._check as check
 from dagster import __version__ as dagster_version
 from dagster._core.debug import DebugRunPayload
+from dagster._core.storage.captured_log_manager import CapturedLogManager
 from dagster._core.storage.compute_log_manager import ComputeIOType
 from dagster._core.workspace.context import BaseWorkspaceRequestContext, IWorkspaceProcessContext
 from dagster._seven import json
@@ -172,6 +173,26 @@ class DagitWebserver(GraphQLServer, Generic[T_IWorkspaceProcessContext]):
             filename=f"{run_id}_{step_key}.{file_type}",
         )
 
+    async def download_captured_logs_endpoint(self, request: Request):
+        [*log_key, file_type] = request.path_params["path"].split("/")
+        context = self.make_request_context(request)
+
+        if not isinstance(context.instance.compute_log_manager, CapturedLogManager):
+            raise HTTPException(404)
+
+        if file_type == ComputeIOType.STDOUT.value:
+            metadata = context.instance.compute_log_manager.get_stdout_metadata(log_key)
+        elif file_type == ComputeIOType.STDERR.value:
+            metadata = context.instance.compute_log_manager.get_stderr_metadata(log_key)
+        else:
+            raise HTTPException(404)
+
+        if not metadata.location or not path.exists(metadata.location):
+            raise HTTPException(404)
+
+        filebase = "__".join(log_key)
+        return FileResponse(metadata.location, filename=f"{filebase}.{file_type}")
+
     def index_html_endpoint(self, _request: Request):
         """
         Serves root html
@@ -256,9 +277,13 @@ class DagitWebserver(GraphQLServer, Generic[T_IWorkspaceProcessContext]):
             + self.build_static_routes()
             + [
                 # download file endpoints
-                Route(
+                Route(  # Legacy endpoint for compute logs
                     "/download/{run_id:str}/{step_key:str}/{file_type:str}",
                     self.download_compute_logs_endpoint,
+                ),
+                Route(  # Endpoint for captured logs
+                    "/logs/{path:path}",
+                    self.download_captured_logs_endpoint,
                 ),
                 Route(
                     "/dagit/notebook",

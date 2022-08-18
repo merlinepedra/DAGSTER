@@ -1,6 +1,8 @@
 import tempfile
 from contextlib import contextmanager
 
+import pytest
+
 import dagster._check as check
 from dagster import job, op
 from dagster._core.instance import DagsterInstance, InstanceRef, InstanceType
@@ -12,9 +14,12 @@ from dagster._core.storage.compute_log_manager import (
     ComputeLogManager,
 )
 from dagster._core.storage.event_log import SqliteEventLogStorage
+from dagster._core.storage.local_compute_log_manager import LocalComputeLogManager
 from dagster._core.storage.root import LocalArtifactStorage
 from dagster._core.storage.runs import SqliteRunStorage
 from dagster._core.test_utils import environ, instance_for_test
+
+from .utils.captured_log_manager import TestCapturedLogManager
 
 
 def test_compute_log_manager_instance():
@@ -141,3 +146,12 @@ def test_broken_compute_log_manager():
         assert not boo_result.success
         assert not _has_setup_exception(boo_result)
         assert not _has_teardown_exception(boo_result)
+
+
+class TestLocalCapturedLogManager(TestCapturedLogManager):
+    __test__ = True
+
+    @pytest.fixture(name="captured_log_manager")
+    def captured_log_manager(self):
+        with tempfile.TemporaryDirectory() as tmpdir_path:
+            return LocalComputeLogManager(tmpdir_path)
