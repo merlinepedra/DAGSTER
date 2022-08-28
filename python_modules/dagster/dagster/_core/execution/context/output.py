@@ -665,7 +665,10 @@ class OutputContext:
         """
         from dagster._core.definitions.metadata import normalize_metadata
 
-        self._metadata_entries = normalize_metadata(metadata, [])
+        self._metadata_entries = [
+            *(self._metadata_entries or []),
+            *normalize_metadata(metadata, []),
+        ]
 
     def get_logged_metadata_entries(
         self,

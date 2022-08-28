@@ -145,7 +145,7 @@ class ExecutionResult(ABC):
         return events[0]
 
     def asset_materializations_for_node(
-        self, node_name
+        self, node_name: str
     ) -> Sequence[Union[Materialization, AssetMaterialization]]:
         return [
             cast(StepMaterializationData, event.event_specific_data).materialization
@@ -153,7 +153,7 @@ class ExecutionResult(ABC):
             if event.event_type_value == DagsterEventType.ASSET_MATERIALIZATION.value
         ]
 
-    def asset_observations_for_node(self, node_name) -> Sequence[AssetObservation]:
+    def asset_observations_for_node(self, node_name: str) -> Sequence[AssetObservation]:
         return [
             cast(AssetObservationData, event.event_specific_data).asset_observation
             for event in self.events_for_node(node_name)
