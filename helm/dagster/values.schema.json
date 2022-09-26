@@ -1946,6 +1946,17 @@
                             "type": "null"
                         }
                     ]
+                },
+                "securityContext": {
+                    "title": "SecurityContext",
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/SecurityContext"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 }
             },
             "required": [
