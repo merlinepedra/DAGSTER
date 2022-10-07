@@ -2190,6 +2190,7 @@ type Instance {
   daemonHealth: DaemonHealth!
   hasInfo: Boolean!
   dagitTelemetryEnabled: Boolean!
+  hasCapturedLogManager: Boolean!
 }
 
 type RunLauncher {

@@ -363,6 +363,7 @@ def from_dagster_event_record(event_record, pipeline_name):
         return GrapheneLogsCapturedEvent(
             fileKey=dagster_event.logs_captured_data.file_key,
             stepKeys=dagster_event.logs_captured_data.step_keys,
+            externalUrl=dagster_event.logs_captured_data.external_url,
             pid=dagster_event.pid,
             **basic_params,
         )

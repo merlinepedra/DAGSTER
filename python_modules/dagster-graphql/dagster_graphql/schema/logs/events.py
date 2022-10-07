@@ -291,6 +291,7 @@ class GrapheneLogsCapturedEvent(graphene.ObjectType):
 
     fileKey = graphene.NonNull(graphene.String)
     stepKeys = graphene.List(graphene.NonNull(graphene.String))
+    externalUrl = graphene.String()
     pid = graphene.Int()
 
 
