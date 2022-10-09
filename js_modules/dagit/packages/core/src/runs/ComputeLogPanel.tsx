@@ -1,10 +1,9 @@
 import {Box, Spinner} from '@dagster-io/ui';
 import * as React from 'react';
 
+import {RawLogContent} from '../RawLogContent';
 import {AppContext} from '../app/AppContext';
 
-import {ComputeLogContent} from './ComputeLogContent';
-import {ComputeLogContentFileFragment} from './types/ComputeLogContentFileFragment';
 import {useComputeLogs} from './useComputeLogs';
 
 interface ComputeLogPanelProps {
@@ -46,11 +45,7 @@ interface ComputeLogPanelWithKeyProps extends ComputeLogPanelProps {
   computeLogKey: string;
 }
 
-const resolveDownloadUrl = (
-  rootServerURI: string,
-  logData: ComputeLogContentFileFragment | null,
-) => {
-  const downloadUrl = logData?.downloadUrl;
+const resolveDownloadUrl = (rootServerURI: string, downloadUrl: string | null) => {
   if (!downloadUrl) {
     return null;
   }
@@ -64,22 +59,24 @@ const ComputeLogsPanelWithKey: React.FC<ComputeLogPanelWithKeyProps> = React.mem
 
   const {isLoading, stdout, stderr} = useComputeLogs(runId, computeLogKey);
   const logData = ioType === 'stdout' ? stdout : stderr;
-  const downloadUrl = resolveDownloadUrl(rootServerURI, logData);
+  const downloadUrl = resolveDownloadUrl(rootServerURI, logData?.downloadUrl || null);
 
   return (
     <div style={{flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column'}}>
       <ContentWrapper
-        logData={stdout}
+        content={stdout ? stdout.data : null}
+        path={stdout ? stdout.path : undefined}
+        downloadUrl={downloadUrl}
         isLoading={isLoading}
         isVisible={ioType === 'stdout'}
-        downloadUrl={downloadUrl}
         setComputeLogUrl={setComputeLogUrl}
       />
       <ContentWrapper
-        logData={stderr}
+        content={stderr ? stderr.data : null}
+        path={stderr ? stderr.path : undefined}
+        downloadUrl={downloadUrl}
         isLoading={isLoading}
         isVisible={ioType === 'stderr'}
-        downloadUrl={downloadUrl}
         setComputeLogUrl={setComputeLogUrl}
       />
     </div>
@@ -89,13 +86,15 @@ const ComputeLogsPanelWithKey: React.FC<ComputeLogPanelWithKeyProps> = React.mem
 const ContentWrapper = ({
   isLoading,
   isVisible,
-  logData,
+  content,
+  path,
   downloadUrl,
   setComputeLogUrl,
 }: {
   isVisible: boolean;
   isLoading: boolean;
-  logData: ComputeLogContentFileFragment | null;
+  content: string | null;
+  path?: string;
   downloadUrl: string | null;
   setComputeLogUrl: (url: string | null) => void;
 }) => {
@@ -103,11 +102,12 @@ const ContentWrapper = ({
     setComputeLogUrl(downloadUrl);
   }, [setComputeLogUrl, downloadUrl]);
   return (
-    <ComputeLogContent
-      logData={logData}
+    <RawLogContent
+      logData={content}
       isLoading={isLoading}
       isVisible={isVisible}
       downloadUrl={downloadUrl}
+      location={path}
     />
   );
 };

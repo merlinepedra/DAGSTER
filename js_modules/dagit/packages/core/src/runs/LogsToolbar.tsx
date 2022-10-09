@@ -157,6 +157,9 @@ const ComputeLogToolbar = ({
     if (captureInfo.stepKeys.length === 1 && fileKey === captureInfo.stepKeys[0]) {
       return fileKey;
     }
+    if (captureInfo.pid && captureInfo.stepKeys.length === 1) {
+      return captureInfo.stepKeys[0];
+    }
     if (captureInfo.pid) {
       return `pid: ${captureInfo.pid} (${captureInfo.stepKeys.length} steps)`;
     }

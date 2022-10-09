@@ -2,6 +2,7 @@ import {Box, NonIdealState, FirstOrSecondPanelToggle, SplitPanelContainer} from 
 import * as React from 'react';
 import styled from 'styled-components/macro';
 
+import {CapturedOrExternalLogPanel} from '../CapturedLogPanel';
 import {showCustomAlert} from '../app/CustomAlertProvider';
 import {filterByQuery} from '../app/GraphQueryImpl';
 import {PythonErrorInfo} from '../app/PythonErrorInfo';
@@ -11,6 +12,7 @@ import {toGraphQueryItems} from '../gantt/toGraphQueryItems';
 import {useDocumentTitle} from '../hooks/useDocumentTitle';
 import {useFavicon} from '../hooks/useFavicon';
 import {useQueryPersistedState} from '../hooks/useQueryPersistedState';
+import {useSupportsCapturedLogs} from '../instance/useSupportsCapturedLogs';
 import {RunStatus} from '../types/globalTypes';
 
 import {ComputeLogPanel} from './ComputeLogPanel';
@@ -157,6 +159,7 @@ const RunWithData: React.FC<RunWithDataProps> = ({
 }) => {
   const onLaunch = useJobReExecution(run);
   const splitPanelContainer = React.createRef<SplitPanelContainer>();
+  const supportsCapturedLogs = useSupportsCapturedLogs();
 
   const [queryLogType, setQueryLogType] = useQueryPersistedState<string>({
     queryKey: 'logType',
@@ -314,13 +317,26 @@ const RunWithData: React.FC<RunWithDataProps> = ({
               counts={logs.counts}
             />
             {logType !== LogType.structured ? (
-              <ComputeLogPanel
-                runId={runId}
-                stepKeys={stepKeys}
-                computeLogKey={computeLogKey}
-                ioType={LogType[logType]}
-                setComputeLogUrl={setComputeLogUrl}
-              />
+              supportsCapturedLogs ? (
+                <CapturedOrExternalLogPanel
+                  logKey={[runId, 'compute_logs', computeLogKey]}
+                  externalUrl={
+                    metadata.logCaptureSteps
+                      ? metadata.logCaptureSteps[computeLogKey].externalUrl
+                      : undefined
+                  }
+                  visibleIOType={LogType[logType]}
+                  onSetDownloadUrl={setComputeLogUrl}
+                />
+              ) : (
+                <ComputeLogPanel
+                  runId={runId}
+                  stepKeys={stepKeys}
+                  computeLogKey={computeLogKey}
+                  ioType={LogType[logType]}
+                  setComputeLogUrl={setComputeLogUrl}
+                />
+              )
             ) : (
               <LogsScrollingTable
                 logs={logs}
