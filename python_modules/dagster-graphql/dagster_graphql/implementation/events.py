@@ -361,7 +361,7 @@ def from_dagster_event_record(event_record, pipeline_name):
         )
     elif dagster_event.event_type == DagsterEventType.LOGS_CAPTURED:
         return GrapheneLogsCapturedEvent(
-            logKey=dagster_event.logs_captured_data.log_key,
+            fileKey=dagster_event.logs_captured_data.file_key,
             stepKeys=dagster_event.logs_captured_data.step_keys,
             pid=dagster_event.pid,
             **basic_params,

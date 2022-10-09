@@ -289,7 +289,7 @@ class GrapheneLogsCapturedEvent(graphene.ObjectType):
         interfaces = (GrapheneMessageEvent,)
         name = "LogsCapturedEvent"
 
-    logKey = graphene.NonNull(graphene.String)
+    fileKey = graphene.NonNull(graphene.String)
     stepKeys = graphene.List(graphene.NonNull(graphene.String))
     pid = graphene.Int()
 
