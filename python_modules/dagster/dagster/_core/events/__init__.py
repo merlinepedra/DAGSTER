@@ -1369,7 +1369,7 @@ class DagsterEvent(
                 message=message,
                 event_specific_data=ComputeLogsCaptureData(
                     step_keys=step_keys,
-                    log_key=log_key,
+                    file_key=log_key,
                 ),
             )
 
@@ -1379,7 +1379,7 @@ class DagsterEvent(
             message=message,
             event_specific_data=ComputeLogsCaptureData(
                 step_keys=step_keys,
-                log_key=log_key,
+                file_key=log_key,
             ),
         )
 
