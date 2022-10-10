@@ -35,9 +35,9 @@ class TestComputeLogs(ExecutingGraphQLContextTestMatrix):
             variables={"logKey": log_key},
         )
         results = []
-        subscription.subscribe(lambda x: results.append(x.data))
+        subscription.subscribe(lambda x: results.append(x.data["capturedLogs"]["stdout"]))
 
         assert len(results) == 1
         result = results[0]
-        assert result["capturedLogs"]["stdout"] == "HELLO WORLD\n"
+        assert result == "HELLO WORLD\n"
         snapshot.assert_match(results)
