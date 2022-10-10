@@ -20,6 +20,7 @@ from typing import (
     cast,
 )
 
+import pendulum
 from typing_extensions import TypeGuard
 
 import dagster._check as check
@@ -912,54 +913,72 @@ class SensorDefinition:
         """
 
         context = check.inst_param(context, "context", SensorEvaluationContext)
-        result = list(self._evaluation_fn(context))
+        compute_log_manager = context.instance.compute_log_manager
 
-        skip_message: Optional[str] = None
+        with ExitStack() as stack:
+            from dagster._core.storage.captured_log_manager import CapturedLogManager
 
-        run_requests: List[RunRequest]
-        pipeline_run_reactions: List[PipelineRunReaction]
-        if not result or result == [None]:
-            run_requests = []
-            pipeline_run_reactions = []
-            skip_message = "Sensor function returned an empty result"
-        elif len(result) == 1:
-            item = result[0]
-            check.inst(item, (SkipReason, RunRequest, PipelineRunReaction))
-            run_requests = [item] if isinstance(item, RunRequest) else []
-            pipeline_run_reactions = (
-                [cast(PipelineRunReaction, item)] if isinstance(item, PipelineRunReaction) else []
+            if isinstance(compute_log_manager, CapturedLogManager):
+                log_key = [
+                    context.repository_name,
+                    self.name,
+                    pendulum.now("UTC").strftime("%Y%m%d_%H%M%S"),
+                ]
+                stack.enter_context(compute_log_manager.capture_logs(log_key))
+            else:
+                log_key = None
+
+            result = list(self._evaluation_fn(context))
+
+            skip_message: Optional[str] = None
+
+            run_requests: List[RunRequest]
+            pipeline_run_reactions: List[PipelineRunReaction]
+            if not result or result == [None]:
+                run_requests = []
+                pipeline_run_reactions = []
+                skip_message = "Sensor function returned an empty result"
+            elif len(result) == 1:
+                item = result[0]
+                check.inst(item, (SkipReason, RunRequest, PipelineRunReaction))
+                run_requests = [item] if isinstance(item, RunRequest) else []
+                pipeline_run_reactions = (
+                    [cast(PipelineRunReaction, item)]
+                    if isinstance(item, PipelineRunReaction)
+                    else []
+                )
+                skip_message = item.skip_message if isinstance(item, SkipReason) else None
+            else:
+                check.is_list(result, (SkipReason, RunRequest, PipelineRunReaction))
+                has_skip = any(map(lambda x: isinstance(x, SkipReason), result))
+                run_requests = [item for item in result if isinstance(item, RunRequest)]
+                pipeline_run_reactions = [
+                    item for item in result if isinstance(item, PipelineRunReaction)
+                ]
+
+                if has_skip:
+                    if len(run_requests) > 0:
+                        check.failed(
+                            "Expected a single SkipReason or one or more RunRequests: received both "
+                            "RunRequest and SkipReason"
+                        )
+                    elif len(pipeline_run_reactions) > 0:
+                        check.failed(
+                            "Expected a single SkipReason or one or more PipelineRunReaction: "
+                            "received both PipelineRunReaction and SkipReason"
+                        )
+                    else:
+                        check.failed("Expected a single SkipReason: received multiple SkipReasons")
+
+            self.check_valid_run_requests(run_requests)
+
+            return SensorExecutionData(
+                run_requests,
+                skip_message,
+                context.cursor,
+                pipeline_run_reactions,
+                captured_log_key=log_key,
             )
-            skip_message = item.skip_message if isinstance(item, SkipReason) else None
-        else:
-            check.is_list(result, (SkipReason, RunRequest, PipelineRunReaction))
-            has_skip = any(map(lambda x: isinstance(x, SkipReason), result))
-            run_requests = [item for item in result if isinstance(item, RunRequest)]
-            pipeline_run_reactions = [
-                item for item in result if isinstance(item, PipelineRunReaction)
-            ]
-
-            if has_skip:
-                if len(run_requests) > 0:
-                    check.failed(
-                        "Expected a single SkipReason or one or more RunRequests: received both "
-                        "RunRequest and SkipReason"
-                    )
-                elif len(pipeline_run_reactions) > 0:
-                    check.failed(
-                        "Expected a single SkipReason or one or more PipelineRunReaction: "
-                        "received both PipelineRunReaction and SkipReason"
-                    )
-                else:
-                    check.failed("Expected a single SkipReason: received multiple SkipReasons")
-
-        self.check_valid_run_requests(run_requests)
-
-        return SensorExecutionData(
-            run_requests,
-            skip_message,
-            context.cursor,
-            pipeline_run_reactions,
-        )
 
     def has_loadable_targets(self) -> bool:
         for target in self._targets:
@@ -1028,6 +1047,7 @@ class SensorExecutionData(
             ("skip_message", Optional[str]),
             ("cursor", Optional[str]),
             ("pipeline_run_reactions", Optional[Sequence[PipelineRunReaction]]),
+            ("captured_log_key", Optional[Sequence[str]]),
         ],
     )
 ):
@@ -1037,11 +1057,13 @@ class SensorExecutionData(
         skip_message: Optional[str] = None,
         cursor: Optional[str] = None,
         pipeline_run_reactions: Optional[Sequence[PipelineRunReaction]] = None,
+        captured_log_key: Optional[Sequence[str]] = None,
     ):
         check.opt_list_param(run_requests, "run_requests", RunRequest)
         check.opt_str_param(skip_message, "skip_message")
         check.opt_str_param(cursor, "cursor")
         check.opt_list_param(pipeline_run_reactions, "pipeline_run_reactions", PipelineRunReaction)
+        check.opt_list_param(captured_log_key, "captured_log_key", str)
         check.invariant(
             not (run_requests and skip_message), "Found both skip data and run request data"
         )
@@ -1051,6 +1073,7 @@ class SensorExecutionData(
             skip_message=skip_message,
             cursor=cursor,
             pipeline_run_reactions=pipeline_run_reactions,
+            captured_log_key=captured_log_key,
         )
 
 

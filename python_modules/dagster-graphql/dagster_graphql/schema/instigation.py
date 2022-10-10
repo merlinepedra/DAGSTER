@@ -105,6 +105,7 @@ class GrapheneInstigationTick(graphene.ObjectType):
     cursor = graphene.String()
     runs = non_null_list("dagster_graphql.schema.pipelines.pipeline.GrapheneRun")
     originRunIds = non_null_list(graphene.String)
+    logKey = graphene.List(graphene.NonNull(graphene.String))
 
     class Meta:
         name = "InstigationTick"
@@ -121,6 +122,7 @@ class GrapheneInstigationTick(graphene.ObjectType):
             skipReason=tick.skip_reason,
             originRunIds=tick.origin_run_ids,
             cursor=tick.cursor,
+            logKey=tick.log_key,
         )
 
     def resolve_id(self, _):
