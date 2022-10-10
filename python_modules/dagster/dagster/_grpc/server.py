@@ -29,6 +29,7 @@ from dagster._core.host_representation.external_data import (
 from dagster._core.host_representation.origin import ExternalRepositoryOrigin
 from dagster._core.instance import DagsterInstance
 from dagster._core.origin import DEFAULT_DAGSTER_ENTRY_POINT, get_python_environment_entry_point
+from dagster._core.storage.captured_log_manager import CapturedLogManager
 from dagster._core.types.loadable_target_origin import LoadableTargetOrigin
 from dagster._serdes import deserialize_as, serialize_dagster_namedtuple, whitelist_for_serdes
 from dagster._serdes.ipc import IPCErrorMessage, ipc_write_stream, open_ipc_subprocess
@@ -73,6 +74,7 @@ from .types import (
 from .utils import get_loadable_targets, max_rx_bytes, max_send_bytes
 
 EVENT_QUEUE_POLL_INTERVAL = 0.1
+COMPUTE_LOG_UPLOAD_INTERVAL = 5
 
 CLEANUP_TICK = 0.5
 
@@ -256,6 +258,11 @@ class DagsterApiServer(DagsterApiServicer):
         self.__cleanup_thread.daemon = True
 
         self.__cleanup_thread.start()
+        self.__compute_log_thread = threading.Thread(
+            target=self._compute_log_thread, args=(), name="grpc-server-compute-logs"
+        )
+        self.__compute_log_thread.daemon = True
+        self.__compute_log_thread.start()
 
     def cleanup(self):
         if self.__heartbeat_thread:
@@ -326,6 +333,36 @@ class DagsterApiServer(DagsterApiServicer):
                 f'Could not find a repository called "{external_repo_origin.repository_name}"'
             )
         return loaded_repos.definitions_by_name[external_repo_origin.repository_name]
+
+    def _compute_log_thread(self):
+        # In order to support streaming uploads for remote compute log managers using the default
+        # run launcher, we have to upload partial results during execution.
+        while True:
+            sleep(COMPUTE_LOG_UPLOAD_INTERVAL)
+            with self._execution_lock:
+                active_runs = self._executions.keys()
+
+            for run_id in active_runs:
+                with self._execution_lock:
+                    if run_id not in self._executions:
+                        continue
+
+                    process, instance_ref = self._executions[run_id]
+                    if not process.is_alive():
+                        continue
+
+                    with DagsterInstance.from_ref(instance_ref) as instance:
+                        if not isinstance(instance.compute_log_manager, CapturedLogManager):
+                            continue
+
+                        in_progress = instance.compute_log_manager.get_in_progress_log_keys(
+                            prefix=instance.compute_log_manager.build_log_key_for_run(
+                                run_id, process.pid
+                            )[:-1]
+                        )
+                        for log_key in in_progress:
+                            if not instance.compute_log_manager.is_capture_complete(log_key):
+                                instance.compute_log_manager.on_progress(log_key)
 
     def Ping(self, request, _context):
         echo = request.echo
