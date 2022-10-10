@@ -360,6 +360,7 @@ class GrapheneDagitQuery(graphene.ObjectType):
     capturedLogsMetadata = graphene.Field(
         graphene.NonNull(GrapheneCapturedLogsMetadata),
         logKey=graphene.Argument(non_null_list(graphene.String)),
+        description="Retrieve the captured log metadata for a given log key.",
     )
 
     def resolve_repositoriesOrError(self, graphene_info, **kwargs):

@@ -218,6 +218,11 @@ type DagitQuery {
   Retrieve event logs after applying a run id filter, cursor, and limit.
   """
   logsForRun(runId: ID!, afterCursor: String, limit: Int): EventConnectionOrError!
+
+  """
+  Retrieve the captured log metadata for a given log key.
+  """
+  capturedLogsMetadata(logKey: [String!]!): CapturedLogsMetadata!
 }
 
 union RepositoriesOrError = RepositoryConnection | PythonError
@@ -1242,6 +1247,7 @@ type LogsCapturedEvent implements MessageEvent {
   eventType: DagsterEventType
   fileKey: String!
   stepKeys: [String!]
+  externalUrl: String
   pid: Int
 }
 
@@ -2279,6 +2285,14 @@ enum AssetComputeStatus {
 
 union EventConnectionOrError = EventConnection | RunNotFoundError | PythonError
 
+type CapturedLogsMetadata {
+  externalUrl: String
+  stdoutDownloadUrl: String
+  stdoutLocation: String
+  stderrDownloadUrl: String
+  stderrLocation: String
+}
+
 """
 The root for all mutations to modify data in your Dagster instance.
 """
@@ -2751,6 +2765,11 @@ type DagitSubscription {
   computeLogs(runId: ID!, stepKey: String!, ioType: ComputeIOType!, cursor: String): ComputeLogFile!
 
   """
+  Retrieve real-time compute logs.
+  """
+  capturedLogs(logKey: [String!]!, cursor: String): CapturedLogs!
+
+  """
   Retrieve real-time events when a location in the workspace undergoes a state change.
   """
   locationStateChangeEvents: LocationStateChangeSubscription!
@@ -2775,6 +2794,13 @@ type PipelineRunLogsSubscriptionFailure {
 enum ComputeIOType {
   STDOUT
   STDERR
+}
+
+type CapturedLogs {
+  logKey: [String!]!
+  stdout: String
+  stderr: String
+  cursor: String
 }
 
 type LocationStateChangeSubscription {
