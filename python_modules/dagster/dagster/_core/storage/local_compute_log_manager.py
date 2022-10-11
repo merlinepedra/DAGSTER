@@ -118,18 +118,7 @@ class LocalComputeLogManager(CapturedLogManager, ComputeLogManager, Configurable
         max_bytes: Optional[int] = None,
     ):
         path = self.get_captured_local_path(log_key, IO_TYPE_EXTENSION[io_type])
-
-        if not os.path.exists(path) or not os.path.isfile(path):
-            return None, offset
-
-        with open(path, "rb") as f:
-            f.seek(offset or 0, os.SEEK_SET)
-            if max_bytes is None:
-                data = f.read()
-            else:
-                data = f.read(max_bytes)
-            new_offset = f.tell()
-        return data, new_offset
+        return self.read_path(path, offset, max_bytes)
 
     def _parse_cursor(self, cursor: Optional[str] = None) -> Tuple[int, int]:
         # Translates a string cursor into a set of byte offsets for stdout, stderr
@@ -156,7 +145,7 @@ class LocalComputeLogManager(CapturedLogManager, ComputeLogManager, Configurable
     def on_progress(self, log_key: List[str]):
         pass
 
-    def _read_path(
+    def read_path(
         self,
         path: str,
         offset: int = 0,

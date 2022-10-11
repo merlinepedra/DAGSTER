@@ -3,7 +3,6 @@ import os
 import sys
 import time
 
-from dagster._core.storage.compute_log_manager import ComputeIOType
 from dagster._serdes.serdes import deserialize_json_to_dagster_namedtuple
 from dagster._utils.interrupts import capture_interrupts, pop_captured_interrupt
 

@@ -149,7 +149,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
             self._download_to_local(log_key, ComputeIOType.STDERR)
         return self._local_manager.get_log_data(log_key, cursor, max_bytes)
 
-    def get_log_metadata(self, log_key: List[str]) -> CapturedLogMetadata:
+    def get_contextual_log_metadata(self, log_key: List[str]) -> CapturedLogMetadata:
         stdout_s3_key = self._s3_key(log_key, ComputeIOType.STDOUT)
         stderr_s3_key = self._s3_key(log_key, ComputeIOType.STDERR)
         stdout_download_url = None
@@ -191,7 +191,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
         return self._local_manager.get_in_progress_log_keys(prefix)
 
     def _has_local_file(self, log_key, io_type):
-        local_path = self._local_manager._get_captured_local_path(
+        local_path = self._local_manager.get_captured_local_path(
             log_key, IO_TYPE_EXTENSION[io_type]
         )
         return os.path.exists(local_path)
@@ -210,7 +210,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
         )
 
     def _upload_from_local(self, log_key, io_type, partial=False):
-        path = self._local_manager._get_captured_local_path(log_key, IO_TYPE_EXTENSION[io_type])
+        path = self._local_manager.get_captured_local_path(log_key, IO_TYPE_EXTENSION[io_type])
         ensure_file(path)
 
         if (self._skip_empty_files or partial) and os.stat(path).st_size == 0:
@@ -221,7 +221,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
             self._s3_session.upload_fileobj(data, self._s3_bucket, s3_key)
 
     def _download_to_local(self, log_key, io_type, partial=False):
-        path = self._local_manager._get_captured_local_path(
+        path = self._local_manager.get_captured_local_path(
             log_key, IO_TYPE_EXTENSION[io_type], partial=partial
         )
         ensure_dir(os.path.dirname(path))
@@ -242,6 +242,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
     @contextmanager
     def _poll_for_local_upload(self, log_key, interval=10):
         poll_file = os.path.abspath(poll_upload.__file__)
+        upload_process = None
         try:
             upload_process = open_ipc_subprocess(
                 [
@@ -314,10 +315,10 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
             return self._from_local_file_data(run_id, key, io_type, data)
         elif self._has_remote_file(log_key, io_type, partial=True):
             self._download_to_local(log_key, io_type, partial=True)
-            partial_path = self._local_manager._get_captured_local_path(
+            partial_path = self._local_manager.get_captured_local_path(
                 log_key, IO_TYPE_EXTENSION[io_type], partial=True
             )
-            captured_data, new_cursor = self._local_manager._read_path(partial_path, offset=cursor)
+            captured_data, new_cursor = self._local_manager.read_path(partial_path, offset=cursor)
             return ComputeLogFileData(
                 path=partial_path,
                 data=captured_data.decode("utf-8") if captured_data else None,
@@ -325,7 +326,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
                 size=len(captured_data) if captured_data else 0,
                 download_url=None,
             )
-        local_path = self._local_manager._get_captured_local_path(
+        local_path = self._local_manager.get_captured_local_path(
             log_key, IO_TYPE_EXTENSION[io_type]
         )
         return ComputeLogFileData(path=local_path, data=None, cursor=0, size=0, download_url=None)
@@ -338,6 +339,7 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
 
     def dispose(self):
         self._subscription_manager.dispose()
+        self._local_manager.dispose()
 
     def _from_local_file_data(self, run_id, key, io_type, local_file_data):
         log_key = self._local_manager.build_log_key_for_run(run_id, key)
@@ -351,9 +353,6 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
             self.download_url(run_id, key, io_type),
         )
 
-    def dispose(self):
-        self._local_manager.dispose()
-
 
 class S3ComputeLogSubscriptionManager:
     def __init__(self, manager):
@@ -366,6 +365,15 @@ class S3ComputeLogSubscriptionManager:
         self.__shutdown_event = threading.Event()
         self.__polling_thread.daemon = True
         self.__polling_thread.start()
+
+    def _log_key(self, subscription):
+        check.inst_param(
+            subscription, "subscription", (ComputeLogSubscription, CapturedLogSubscription)
+        )
+
+        if isinstance(subscription, ComputeLogSubscription):
+            return self._manager.build_log_key_for_run(subscription.run_id, subscription.key)
+        return subscription.log_key
 
     def _watch_key(self, log_key: List[str]) -> str:
         return json.dumps(log_key)
@@ -384,6 +392,15 @@ class S3ComputeLogSubscriptionManager:
             log_key = self._log_key(subscription)
             watch_key = self._watch_key(log_key)
             self._subscriptions[watch_key].append(subscription)
+
+    def is_complete(self, subscription: Union[ComputeLogSubscription, CapturedLogSubscription]):
+        check.inst_param(
+            subscription, "subscription", (ComputeLogSubscription, CapturedLogSubscription)
+        )
+
+        if isinstance(subscription, ComputeLogSubscription):
+            return self._manager.is_watch_completed(subscription.run_id, subscription.key)
+        return self._manager.is_capture_complete(subscription.log_key)
 
     def remove_subscription(self, subscription):
         check.inst_param(subscription, "subscription", ComputeLogSubscription)
