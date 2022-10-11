@@ -318,7 +318,9 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
             partial_path = self._local_manager.get_captured_local_path(
                 log_key, IO_TYPE_EXTENSION[io_type], partial=True
             )
-            captured_data, new_cursor = self._local_manager.read_path(partial_path, offset=cursor)
+            captured_data, new_cursor = self._local_manager.read_path(
+                partial_path, offset=cursor or 0
+            )
             return ComputeLogFileData(
                 path=partial_path,
                 data=captured_data.decode("utf-8") if captured_data else None,
