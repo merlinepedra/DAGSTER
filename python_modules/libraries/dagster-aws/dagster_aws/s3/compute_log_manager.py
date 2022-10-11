@@ -35,6 +35,7 @@ from dagster._serdes import ConfigurableClass, ConfigurableClassData, serialize_
 from dagster._serdes.ipc import interrupt_ipc_subprocess, open_ipc_subprocess
 from dagster._seven import wait_for_process
 from dagster._utils import ensure_dir, ensure_file
+from dagster._utils.yaml_utils import dump_run_config_yaml
 
 from . import poll_upload
 
@@ -241,24 +242,29 @@ class S3ComputeLogManager(CapturedLogManager, ComputeLogManager, ConfigurableCla
 
     @contextmanager
     def _poll_for_local_upload(self, log_key, interval=10):
-        poll_file = os.path.abspath(poll_upload.__file__)
-        upload_process = None
-        try:
-            upload_process = open_ipc_subprocess(
-                [
-                    sys.executable,
-                    poll_file,
-                    str(os.getpid()),
-                    serialize_dagster_namedtuple(self.inst_data),
-                    json.dumps(log_key),
-                    str(interval),
-                ]
-            )
+        if self._inst_data:
+            poll_file = os.path.abspath(poll_upload.__file__)
+            upload_process = None
+            try:
+                upload_process = open_ipc_subprocess(
+                    [
+                        sys.executable,
+                        poll_file,
+                        str(os.getpid()),
+                        serialize_dagster_namedtuple(self.inst_data),
+                        json.dumps(log_key),
+                        str(interval),
+                    ]
+                )
+                yield
+            except:
+                print("blahhh exc")
+            finally:
+                if upload_process:
+                    interrupt_ipc_subprocess(upload_process)
+                    wait_for_process(upload_process)
+        else:
             yield
-        finally:
-            if upload_process:
-                interrupt_ipc_subprocess(upload_process)
-                wait_for_process(upload_process)
 
     ###############################################
     #
