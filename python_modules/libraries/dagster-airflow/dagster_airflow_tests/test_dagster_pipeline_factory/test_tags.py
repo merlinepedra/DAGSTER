@@ -115,11 +115,17 @@ def test_pipeline_auto_tag():
             instance=instance,
         )
 
+        capture_events = [
+            event
+            for event in result.event_list
+            if event.event_type == DagsterEventType.LOGS_CAPTURED
+        ]
+        event = capture_events[0]
+        assert event.logs_captured_data.step_keys == ["airflow_templated"]
+        file_key = event.logs_captured_data.file_key
         post_execute_time = get_current_datetime_in_utc()
 
-        compute_io_path = manager.get_local_path(
-            result.run_id, "airflow_templated", ComputeIOType.STDOUT
-        )
+        compute_io_path = manager.get_local_path(result.run_id, file_key, ComputeIOType.STDOUT)
         assert os.path.exists(compute_io_path)
         stdout_file = open(compute_io_path, "r", encoding="utf8")
         file_contents = normalize_file_content(stdout_file.read())

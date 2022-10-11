@@ -180,7 +180,6 @@ def test_template_task_dag():
 
         assert file_contents.count("INFO - Running command: echo hello dagsir\n") == 1
         assert file_contents.count("INFO - Running command: sleep 2\n") == 1
-        assert file_contents.count("INFO - Output:\n") == 1
         assert (
             file_contents.count(
                 "INFO - Running command: \n    \n        "
