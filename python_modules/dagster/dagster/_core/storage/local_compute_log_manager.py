@@ -14,7 +14,7 @@ from dagster._core.execution.compute_logs import mirror_stream_to_file
 from dagster._core.storage.pipeline_run import PipelineRun
 from dagster._serdes import ConfigurableClass, ConfigurableClassData
 from dagster._seven import json
-from dagster._utils import ensure_dir, touch_file
+from dagster._utils import ensure_dir, ensure_file, touch_file
 
 from .captured_log_manager import (
     CapturedLogData,
@@ -80,6 +80,12 @@ class LocalComputeLogManager(CapturedLogManager, ComputeLogManager, Configurable
 
     def is_capture_complete(self, log_key: List[str]):
         return os.path.exists(self.complete_artifact_path(log_key))
+
+    def write_log(self, log_key: List[str], message: str):
+        errpath = self.get_captured_local_path(log_key, IO_TYPE_EXTENSION[ComputeIOType.STDERR])
+        ensure_file(errpath)
+        with open(errpath, "+a") as f:
+            print(message, file=f)
 
     def get_log_data(
         self, log_key: List[str], cursor: Optional[str] = None, max_bytes: Optional[int] = None

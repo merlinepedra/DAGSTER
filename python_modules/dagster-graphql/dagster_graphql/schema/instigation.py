@@ -94,6 +94,23 @@ class GrapheneInstigationTypeSpecificData(graphene.Union):
         name = "InstigationTypeSpecificData"
 
 
+class GrapheneInstigationEvent(graphene.ObjectType):
+    class Meta:
+        name = "InstigationEvent"
+
+    message = graphene.NonNull(graphene.String)
+    timestamp = graphene.NonNull(graphene.String)
+    level = graphene.NonNull(GrapheneLogLevel)
+
+
+class GrapheneInstigationEventConnection(graphene.ObjectType):
+    class Meta:
+        name = "EventConnection"
+
+    events = non_null_list(GrapheneInstigationEvent)
+    cursor = graphene.NonNull(graphene.String)
+    hasMore = graphene.NonNull(graphene.Boolean)
+
 class GrapheneInstigationTick(graphene.ObjectType):
     id = graphene.NonNull(graphene.ID)
     status = graphene.NonNull(GrapheneInstigationTickStatus)
@@ -106,6 +123,7 @@ class GrapheneInstigationTick(graphene.ObjectType):
     runs = non_null_list("dagster_graphql.schema.pipelines.pipeline.GrapheneRun")
     originRunIds = non_null_list(graphene.String)
     logKey = graphene.List(graphene.NonNull(graphene.String))
+
 
     class Meta:
         name = "InstigationTick"

@@ -1,5 +1,6 @@
 import inspect
 import json
+import logging
 import warnings
 from collections import OrderedDict, defaultdict
 from contextlib import ExitStack
@@ -24,6 +25,7 @@ import pendulum
 from typing_extensions import TypeGuard
 
 import dagster._check as check
+from dagster import _seven
 from dagster._annotations import experimental, public
 from dagster._core.definitions.asset_selection import AssetSelection
 from dagster._core.definitions.assets import AssetsDefinition
@@ -35,9 +37,12 @@ from dagster._core.errors import (
     DagsterInvalidInvocationError,
     DagsterInvariantViolationError,
 )
-from dagster._core.instance import DagsterInstance
+from dagster._core.instance import DagsterInstance, MayHaveInstanceWeakref
 from dagster._core.instance.ref import InstanceRef
+from dagster._core.storage.captured_log_manager import CapturedLogManager
+from dagster._core.utils import coerce_valid_log_level
 from dagster._serdes import whitelist_for_serdes
+from dagster._utils.log import create_console_log_handler
 
 from ..decorator_utils import get_function_params
 from .events import AssetKey
@@ -62,6 +67,62 @@ class DefaultSensorStatus(Enum):
 
 
 DEFAULT_SENSOR_DAEMON_INTERVAL = 30
+
+
+class InstigationLogHandler(logging.Handler, MayHaveInstanceWeakref):
+    """
+    The main purpose of this log handler is to annotate user-logged records from within a run
+    instigator (sensor/schedule) with relevant information, and then route them to the appropriate
+    handlers, which themselves are attached to different loggers
+    """
+
+    def __init__(self, log_key: Optional[List[str]] = None):
+        self._log_key = log_key
+        self._console_logger = create_console_log_handler("dagster", logging.INFO)
+        self._should_capture = True
+        super().__init__()
+
+    def _annotate_record(self, record: logging.LogRecord) -> logging.LogRecord:
+        # update the message to be formatted like other dagster logs
+        # record.msg = construct_log_string(self._logging_metadata, dagster_message_props)
+        # record.args = ()
+        return record
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return self._should_capture
+
+    def emit(self, record: logging.LogRecord):
+        """For any received record, add metadata, and have handlers handle it"""
+
+        try:
+            self._should_capture = False
+            annotated_record = self._annotate_record(record)
+            if (
+                self._instance
+                and self._log_key
+                and isinstance(self._instance.compute_log_manager, CapturedLogManager)
+            ):
+                self._instance.compute_log_manager.write_log(
+                    self._log_key, _seven.json.dumps(annotated_record.__dict__)
+                )
+            self._console_logger.log(
+                annotated_record.levelno,
+                annotated_record.msg,
+                exc_info=annotated_record.exc_info,
+            )
+        finally:
+            self._should_capture = True
+
+
+class InstigationLogger(logging.Logger, MayHaveInstanceWeakref):
+    def __init__(self, log_key: Optional[List[str]] = None, level: int = logging.NOTSET):
+        super().__init__(name="dagster", level=coerce_valid_log_level(level))
+        self._log_handler = InstigationLogHandler(log_key)
+        self.addHandler(self._log_handler)
+
+    def register_instance(self, instance):
+        super().register_instance(instance)
+        self._log_handler.register_instance(instance)
 
 
 class SensorEvaluationContext:
@@ -102,6 +163,7 @@ class SensorEvaluationContext:
         cursor: Optional[str],
         repository_name: Optional[str],
         instance: Optional[DagsterInstance] = None,
+        sensor_name: Optional[str] = None,
     ):
         self._exit_stack = ExitStack()
         self._instance_ref = check.opt_inst_param(instance_ref, "instance_ref", InstanceRef)
@@ -112,8 +174,18 @@ class SensorEvaluationContext:
         self._cursor = check.opt_str_param(cursor, "cursor")
         self._repository_name = check.opt_str_param(repository_name, "repository_name")
         self._instance = check.opt_inst_param(instance, "instance", DagsterInstance)
+        self._log_key = None
+        self._logger = None
+        self._sensor_name = sensor_name
 
     def __enter__(self):
+        if self._repository_name and self._sensor_def:
+            self._log_key = [
+                self._repository_name,
+                self._sensor_name,
+                pendulum.now("UTC").strftime("%Y%m%d_%H%M%S"),
+            ]
+        self._logger = InstigationLogger(self._log_key)
         return self
 
     def __exit__(self, _exception_type, _exception_value, _traceback):
@@ -167,6 +239,20 @@ class SensorEvaluationContext:
     @property
     def repository_name(self) -> Optional[str]:
         return self._repository_name
+
+    @property
+    def log(self) -> InstigationLogger:
+        if not self._logger:
+            self._logger = InstigationLogger(self._log_key)
+
+        if self._log_key and not self._logger._instance:
+            self._logger.register_instance(self.instance)
+
+        return self._logger
+
+    @property
+    def log_key(self) -> Optional[List[str]]:
+        return self._log_key
 
 
 def _get_partition_key_from_event_log_record(event_log_record: "EventLogRecord") -> Optional[str]:
@@ -226,6 +312,7 @@ class MultiAssetSensorEvaluationContext(SensorEvaluationContext):
         repository_def: "RepositoryDefinition",
         asset_selection: AssetSelection,
         instance: Optional[DagsterInstance] = None,
+        sensor_name: Optional[str] = None,
     ):
         self._repository_def = repository_def
         self._asset_keys = list(
@@ -259,6 +346,7 @@ class MultiAssetSensorEvaluationContext(SensorEvaluationContext):
             cursor=cursor,
             repository_name=repository_name,
             instance=instance,
+            sensor_name=sensor_name,
         )
 
     def _get_partitions_after_cursor(self, asset_key: AssetKey) -> List[str]:
@@ -913,72 +1001,56 @@ class SensorDefinition:
         """
 
         context = check.inst_param(context, "context", SensorEvaluationContext)
-        compute_log_manager = context.instance.compute_log_manager
 
-        with ExitStack() as stack:
-            from dagster._core.storage.captured_log_manager import CapturedLogManager
+        result = list(self._evaluation_fn(context))
 
-            if isinstance(compute_log_manager, CapturedLogManager):
-                log_key = [
-                    context.repository_name,
-                    self.name,
-                    pendulum.now("UTC").strftime("%Y%m%d_%H%M%S"),
-                ]
-                stack.enter_context(compute_log_manager.capture_logs(log_key))
-            else:
-                log_key = None
+        skip_message: Optional[str] = None
 
-            result = list(self._evaluation_fn(context))
-
-            skip_message: Optional[str] = None
-
-            run_requests: List[RunRequest]
-            pipeline_run_reactions: List[PipelineRunReaction]
-            if not result or result == [None]:
-                run_requests = []
-                pipeline_run_reactions = []
-                skip_message = "Sensor function returned an empty result"
-            elif len(result) == 1:
-                item = result[0]
-                check.inst(item, (SkipReason, RunRequest, PipelineRunReaction))
-                run_requests = [item] if isinstance(item, RunRequest) else []
-                pipeline_run_reactions = (
-                    [cast(PipelineRunReaction, item)]
-                    if isinstance(item, PipelineRunReaction)
-                    else []
-                )
-                skip_message = item.skip_message if isinstance(item, SkipReason) else None
-            else:
-                check.is_list(result, (SkipReason, RunRequest, PipelineRunReaction))
-                has_skip = any(map(lambda x: isinstance(x, SkipReason), result))
-                run_requests = [item for item in result if isinstance(item, RunRequest)]
-                pipeline_run_reactions = [
-                    item for item in result if isinstance(item, PipelineRunReaction)
-                ]
-
-                if has_skip:
-                    if len(run_requests) > 0:
-                        check.failed(
-                            "Expected a single SkipReason or one or more RunRequests: received both "
-                            "RunRequest and SkipReason"
-                        )
-                    elif len(pipeline_run_reactions) > 0:
-                        check.failed(
-                            "Expected a single SkipReason or one or more PipelineRunReaction: "
-                            "received both PipelineRunReaction and SkipReason"
-                        )
-                    else:
-                        check.failed("Expected a single SkipReason: received multiple SkipReasons")
-
-            self.check_valid_run_requests(run_requests)
-
-            return SensorExecutionData(
-                run_requests,
-                skip_message,
-                context.cursor,
-                pipeline_run_reactions,
-                captured_log_key=log_key,
+        run_requests: List[RunRequest]
+        pipeline_run_reactions: List[PipelineRunReaction]
+        if not result or result == [None]:
+            run_requests = []
+            pipeline_run_reactions = []
+            skip_message = "Sensor function returned an empty result"
+        elif len(result) == 1:
+            item = result[0]
+            check.inst(item, (SkipReason, RunRequest, PipelineRunReaction))
+            run_requests = [item] if isinstance(item, RunRequest) else []
+            pipeline_run_reactions = (
+                [cast(PipelineRunReaction, item)] if isinstance(item, PipelineRunReaction) else []
             )
+            skip_message = item.skip_message if isinstance(item, SkipReason) else None
+        else:
+            check.is_list(result, (SkipReason, RunRequest, PipelineRunReaction))
+            has_skip = any(map(lambda x: isinstance(x, SkipReason), result))
+            run_requests = [item for item in result if isinstance(item, RunRequest)]
+            pipeline_run_reactions = [
+                item for item in result if isinstance(item, PipelineRunReaction)
+            ]
+
+            if has_skip:
+                if len(run_requests) > 0:
+                    check.failed(
+                        "Expected a single SkipReason or one or more RunRequests: received both "
+                        "RunRequest and SkipReason"
+                    )
+                elif len(pipeline_run_reactions) > 0:
+                    check.failed(
+                        "Expected a single SkipReason or one or more PipelineRunReaction: "
+                        "received both PipelineRunReaction and SkipReason"
+                    )
+                else:
+                    check.failed("Expected a single SkipReason: received multiple SkipReasons")
+
+        self.check_valid_run_requests(run_requests)
+
+        return SensorExecutionData(
+            run_requests,
+            skip_message,
+            context.cursor,
+            pipeline_run_reactions,
+            captured_log_key=context.log_key,
+        )
 
     def has_loadable_targets(self) -> bool:
         for target in self._targets:
@@ -1109,6 +1181,7 @@ def build_sensor_context(
     instance: Optional[DagsterInstance] = None,
     cursor: Optional[str] = None,
     repository_name: Optional[str] = None,
+    sensor_name: Optional[str] = None,
 ) -> SensorEvaluationContext:
     """Builds sensor execution context using the provided parameters.
 
@@ -1140,6 +1213,7 @@ def build_sensor_context(
         cursor=cursor,
         repository_name=repository_name,
         instance=instance,
+        sensor_name=sensor_name,
     )
 
 

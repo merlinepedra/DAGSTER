@@ -297,6 +297,7 @@ def get_external_sensor_execution(
                     repository_name=repo_def.name,
                     repository_def=repo_def,
                     asset_selection=sensor_def.asset_selection,
+                    sensor_name=sensor_name,
                 )
             )
         else:
@@ -307,6 +308,7 @@ def get_external_sensor_execution(
                     last_run_key=last_run_key,
                     cursor=cursor,
                     repository_name=repo_def.name,
+                    sensor_name=sensor_name,
                 )
             )
 

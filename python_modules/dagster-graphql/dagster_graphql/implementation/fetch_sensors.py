@@ -4,7 +4,8 @@ import dagster._check as check
 from dagster._core.definitions.run_request import InstigatorType
 from dagster._core.host_representation import PipelineSelector, RepositorySelector, SensorSelector
 from dagster._core.scheduler.instigation import InstigatorState, SensorInstigatorData
-from dagster._seven import get_current_datetime_in_utc, get_timestamp_from_utc_datetime
+from dagster._core.storage.captured_log_manager import CapturedLogManager
+from dagster._seven import get_current_datetime_in_utc, get_timestamp_from_utc_datetime, json
 
 from .loader import RepositoryScopedBatchLoader
 from .utils import UserFacingGraphQLError, capture_error
@@ -235,3 +236,35 @@ def set_sensor_cursor(graphene_info, selector, cursor):
         instance.update_instigator_state(updated_state)
 
     return GrapheneSensor(external_sensor, updated_state)
+
+def get_sensor_tick_events(graphene_info, tick, cursor=None):
+    compute_log_manager = graphene_info.context.instance.compute_log_manager
+
+    if not tick.log_key:
+        return []
+
+    if not isinstance(compute_log_manager, CapturedLogManager):
+        return []
+
+    log_data = compute_log_manager.get_log_data(log_key, cursor)
+    raw_logs = log_data.stderr.decode('utf-8') if log_data.stderr else ""
+    messages = []
+    for line in raw_logs:
+        if not line:
+            continue
+
+        try:
+            message_dict = json.loads(line)
+            messages.append(StructuredLoggerMessage(
+                name=message_dict['name'],
+                record=logging.makeLogRecord(message_dict)
+            ))
+        except:
+            continue
+
+    return GrapheneInstigationEvent(
+        message=message_dict['msg'],
+        level=message_dict['levelno'],
+        timestamp=message_dict[]
+    )
+    for message in message

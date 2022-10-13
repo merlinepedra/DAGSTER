@@ -135,6 +135,16 @@ class CapturedLogManager(ABC):
         """
 
     @abstractmethod
+    def write_log(self, log_key: List[str], msg: str):
+        """
+        Writes a message to the log file corresponding to a given log key.
+
+        Args:
+            log_key (List[String]): The log key identifying the captured logs
+            message (String): The message to write to the log file
+        """
+
+    @abstractmethod
     def is_capture_complete(self, log_key: List[str]):
         """Flag indicating when the log capture for a given log key has completed.
 
