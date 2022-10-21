@@ -121,6 +121,7 @@ from dagster._core.definitions.configurable import (
 )
 from dagster._core.definitions.decorators.asset_decorator import (
     asset as asset,
+    graph_asset as graph_asset,
     multi_asset as multi_asset,
 )
 from dagster._core.definitions.decorators.config_mapping_decorator import (
