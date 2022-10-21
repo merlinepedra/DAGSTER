@@ -75,6 +75,7 @@
     "children": [
       {
         "title": "Assets",
+        "path": "/concepts/assets/software-defined-assets",
         "children": [
           {
             "title": "Software-Defined Assets",
@@ -100,6 +101,7 @@
       },
       {
         "title": "Ops",
+        "path": "/concepts/ops-jobs-graphs/ops",
         "children": [
           {
             "title": "Ops",
@@ -121,6 +123,7 @@
       },
       {
         "title": "Graphs",
+        "path": "/concepts/ops-jobs-graphs/graphs",
         "children": [
           {
             "title": "Graphs",
@@ -138,6 +141,7 @@
       },
       {
         "title": "Jobs",
+        "path": "/concepts/ops-jobs-graphs/jobs",
         "children": [
           {
             "title": "Jobs",
@@ -180,6 +184,7 @@
       },
       {
         "title": "IO Management",
+        "path": "/concepts/io-management/io-managers",
         "children": [
           {
             "title": "IO Managers",
@@ -193,6 +198,7 @@
       },
       {
         "title": "Configuration",
+        "path": "/concepts/configuration/config-schema",
         "children": [
           {
             "title": "Run Configuration",
@@ -206,6 +212,7 @@
       },
       {
         "title": "Repositories & Workspaces",
+        "path": "/concepts/repositories-workspaces/repositories",
         "children": [
           {
             "title": "Repositories",
@@ -219,12 +226,7 @@
       },
       {
         "title": "Resources",
-        "children": [
-          {
-            "title": "Resources",
-            "path": "/concepts/resources"
-          }
-        ]
+        "path": "/concepts/resources"
       },
       {
         "title": "Dagit UI & GraphQL API",
@@ -245,12 +247,7 @@
       },
       {
         "title": "Dagster Types",
-        "children": [
-          {
-            "title": "Dagster Types",
-            "path": "/concepts/types"
-          }
-        ]
+        "path": "/concepts/types"
       },
       {
         "title": "Logging",
@@ -267,12 +264,7 @@
       },
       {
         "title": "Testing",
-        "children": [
-          {
-            "title": "Testing",
-            "path": "/concepts/testing"
-          }
-        ]
+        "path": "/concepts/testing"
       }
     ]
   },
