@@ -5,8 +5,11 @@ import re
 import pytest
 
 from dagster import (
+    In,
+    Out,
     AssetKey,
     AssetsDefinition,
+    GraphDefinition,
     DagsterEventType,
     DagsterExecutionStepNotFoundError,
     DependencyDefinition,
@@ -17,41 +20,47 @@ from dagster import (
     op,
     reconstructable,
     repository,
+    mem_io_manager,
+    in_process_executor,
 )
 from dagster._core.definitions.cacheable_assets import (
     AssetsDefinitionCacheableData,
     CacheableAssetsDefinition,
 )
 from dagster._core.definitions.pipeline_base import InMemoryPipeline
-from dagster._core.definitions.reconstruct import ReconstructablePipeline, ReconstructableRepository
+from dagster._core.definitions.reconstruct import (
+    ReconstructablePipeline,
+    ReconstructableRepository,
+)
 from dagster._core.execution.api import create_execution_plan, execute_plan
 from dagster._core.execution.plan.plan import ExecutionPlan
 from dagster._core.instance import DagsterInstance
 from dagster._core.system_config.objects import ResolvedRunConfig
 from dagster._core.test_utils import default_mode_def_for_test, instance_for_test
-from dagster._legacy import InputDefinition, OutputDefinition, PipelineDefinition, lambda_solid
 
 
 def define_inty_pipeline(using_file_system=False):
-    @lambda_solid
+    @op
     def return_one():
         return 1
 
-    @lambda_solid(input_defs=[InputDefinition("num", Int)], output_def=OutputDefinition(Int))
+    @op(ins={"num": In(Int)}, out=Out(Int))
     def add_one(num):
         return num + 1
 
-    @lambda_solid
+    @op
     def user_throw_exception():
         raise Exception("whoops")
 
-    pipeline = PipelineDefinition(
+    the_job = GraphDefinition(
         name="basic_external_plan_execution",
-        solid_defs=[return_one, add_one, user_throw_exception],
+        node_defs=[return_one, add_one, user_throw_exception],
         dependencies={"add_one": {"num": DependencyDefinition("return_one")}},
-        mode_defs=[default_mode_def_for_test] if using_file_system else None,
+    ).to_job(
+        resource_defs=None if using_file_system else {"io_manager": mem_io_manager},
+        executor_def=None if using_file_system else in_process_executor,
     )
-    return pipeline
+    return the_job
 
 
 def define_reconstructable_inty_pipeline():
@@ -138,7 +147,7 @@ def test_using_file_system_for_subplan_multiprocessing():
                 ),
                 pipeline,
                 instance,
-                run_config=dict(execution={"multiprocess": {}}),
+                run_config=dict(execution={"config": {"multiprocess": {}}}),
                 pipeline_run=pipeline_run,
             )
         )
@@ -162,7 +171,7 @@ def test_using_file_system_for_subplan_multiprocessing():
                 ),
                 pipeline,
                 instance,
-                run_config=dict(execution={"multiprocess": {}}),
+                run_config=dict(execution={"config": {"multiprocess": {}}}),
                 pipeline_run=pipeline_run,
             )
         )
@@ -283,7 +292,8 @@ def test_using_repository_data():
         )
 
         recon_repo = ReconstructableRepository.for_file(
-            file_relative_path(__file__, "test_external_execution_plan.py"), fn_name="pending_repo"
+            file_relative_path(__file__, "test_external_execution_plan.py"),
+            fn_name="pending_repo",
         )
         recon_pipeline = ReconstructablePipeline(
             repository=recon_repo, pipeline_name="all_asset_job"
