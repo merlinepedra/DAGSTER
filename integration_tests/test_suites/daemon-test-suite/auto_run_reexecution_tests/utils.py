@@ -48,7 +48,7 @@ def get_bar_repo_handle(instance):
 
 
 @contextmanager
-def get_foo_pipeline_handle(instance):
+def get_foo_job_handle(instance):
     with get_bar_repo_handle(instance) as repo_handle:
         yield PipelineHandle("foo", repo_handle)
 
