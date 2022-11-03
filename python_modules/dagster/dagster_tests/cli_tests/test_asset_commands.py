@@ -1,10 +1,9 @@
 import pytest
 from click.testing import CliRunner
 
-from dagster import AssetKey, AssetMaterialization, Output
+from dagster import job, op, AssetKey, AssetMaterialization, Output
 from dagster._cli.asset import asset_wipe_command
 from dagster._core.instance import DagsterInstance
-from dagster._legacy import execute_pipeline, pipeline, solid
 from dagster._seven import json
 
 
@@ -19,35 +18,35 @@ def mock_asset_instance(mocker):
     yield instance
 
 
-@solid
-def solid_one(_):
+@op
+def op_one(_):
     yield AssetMaterialization(asset_key=AssetKey("asset_1"))
     yield Output(1)
 
 
-@solid
-def solid_two(_):
+@op
+def op_two(_):
     yield AssetMaterialization(asset_key=AssetKey("asset_2"))
     yield AssetMaterialization(asset_key=AssetKey(["path", "to", "asset_3"]))
     yield AssetMaterialization(asset_key=AssetKey(("path", "to", "asset_4")))
     yield Output(1)
 
 
-@solid
-def solid_normalization(_):
+@op
+def op_normalization(_):
     yield AssetMaterialization(asset_key="path/to-asset_5")
     yield Output(1)
 
 
-@pipeline
-def pipeline_one():
-    solid_one()
+@job
+def job_one():
+    op_one()
 
 
-@pipeline
-def pipeline_two():
-    solid_one()
-    solid_two()
+@job
+def job_two():
+    op_one()
+    op_two()
 
 
 def test_asset_wipe_errors(asset_instance):  # pylint: disable=unused-argument
@@ -59,7 +58,9 @@ def test_asset_wipe_errors(asset_instance):  # pylint: disable=unused-argument
         in result.output
     )
 
-    result = runner.invoke(asset_wipe_command, ["--all", json.dumps(["path", "to", "asset_key"])])
+    result = runner.invoke(
+        asset_wipe_command, ["--all", json.dumps(["path", "to", "asset_key"])]
+    )
     assert result.exit_code == 2
     assert "Error, cannot use more than one of: asset key, `--all`." in result.output
 
@@ -73,8 +74,8 @@ def test_asset_exit(asset_instance):  # pylint: disable=unused-argument
 
 def test_asset_single_wipe(asset_instance):
     runner = CliRunner()
-    execute_pipeline(pipeline_one, instance=asset_instance)
-    execute_pipeline(pipeline_two, instance=asset_instance)
+    job_one.execute_in_process(instance=asset_instance)
+    job_two.execute_in_process(instance=asset_instance)
     asset_keys = asset_instance.all_asset_keys()
     assert len(asset_keys) == 4
 
@@ -96,8 +97,8 @@ def test_asset_single_wipe(asset_instance):
 
 def test_asset_multi_wipe(asset_instance):
     runner = CliRunner()
-    execute_pipeline(pipeline_one, instance=asset_instance)
-    execute_pipeline(pipeline_two, instance=asset_instance)
+    job_one.execute_in_process(instance=asset_instance)
+    job_two.execute_in_process(instance=asset_instance)
     asset_keys = asset_instance.all_asset_keys()
     assert len(asset_keys) == 4
 
@@ -114,8 +115,8 @@ def test_asset_multi_wipe(asset_instance):
 
 def test_asset_wipe_all(asset_instance):
     runner = CliRunner()
-    execute_pipeline(pipeline_one, instance=asset_instance)
-    execute_pipeline(pipeline_two, instance=asset_instance)
+    job_one.execute_in_process(instance=asset_instance)
+    job_two.execute_in_process(instance=asset_instance)
     asset_keys = asset_instance.all_asset_keys()
     assert len(asset_keys) == 4
 
@@ -128,8 +129,8 @@ def test_asset_wipe_all(asset_instance):
 
 def test_asset_single_wipe_noprompt(asset_instance):
     runner = CliRunner()
-    execute_pipeline(pipeline_one, instance=asset_instance)
-    execute_pipeline(pipeline_two, instance=asset_instance)
+    job_one.execute_in_process(instance=asset_instance)
+    job_two.execute_in_process(instance=asset_instance)
     asset_keys = asset_instance.all_asset_keys()
     assert len(asset_keys) == 4
 
