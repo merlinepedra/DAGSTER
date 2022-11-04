@@ -31,11 +31,7 @@ from .asset_layer import build_asset_selection_job
 from .assets import AssetsDefinition
 from .assets_job import check_resources_satisfy_requirements
 from .job_definition import JobDefinition, default_job_io_manager_with_fs_io_manager_schema
-from .load_assets_from_modules import (
-    assets_and_source_assets_from_modules,
-    assets_and_source_assets_from_package_module,
-    prefix_assets,
-)
+from .load_assets_from_modules import assets_from_modules, assets_from_package_module, prefix_assets
 from .resource_definition import ResourceDefinition
 from .source_asset import SourceAsset
 
@@ -257,9 +253,7 @@ class AssetGroup:
         Returns:
             AssetGroup: An asset group with all the assets in the package.
         """
-        assets, source_assets = assets_and_source_assets_from_package_module(
-            package_module, extra_source_assets
-        )
+        assets, source_assets, _ = assets_from_package_module(package_module, extra_source_assets)
         return AssetGroup(
             assets=assets,
             source_assets=source_assets,
@@ -321,7 +315,7 @@ class AssetGroup:
         Returns:
             AssetGroup: An asset group with all the assets defined in the given modules.
         """
-        assets, source_assets = assets_and_source_assets_from_modules(modules, extra_source_assets)
+        assets, source_assets, _ = assets_from_modules(modules, extra_source_assets)
 
         return AssetGroup(
             assets=assets,
