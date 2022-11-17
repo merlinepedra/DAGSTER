@@ -93,10 +93,11 @@ class SchemaType(ABC):
         formatted_desc = f"{name} ({self.annotation(hide_default=True)}): {self.description}"
         desc_escaped_trailing_underscores = re.sub(
             r"_([^a-zA-Z0-9_])",
-            r"\\\\_\1",
+            r"\\_\1",
             formatted_desc,
         )
-        desc_removed_tags = re.sub("<[^<]+?>", "", desc_escaped_trailing_underscores)
+        desc_escaped_backslashes = desc_escaped_trailing_underscores.replace("\\", "\\\\")
+        desc_removed_tags = re.sub("<[^<]+?>", "", desc_escaped_backslashes)
         return desc_removed_tags
 
 
@@ -381,7 +382,7 @@ def create_connector_class_definition(
     )
     fields_doc = "\n".join(
         [
-            textwrap.indent(field_type.get_doc_desc(field_name) or '', "            ")
+            textwrap.indent(field_type.get_doc_desc(field_name) or "", "            ")
             for field_name, field_type in cls_def.items()
             if field_type.description
         ]

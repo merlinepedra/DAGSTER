@@ -5446,7 +5446,7 @@ class MetabaseSource(GeneratedAirbyteSource):
         Args:
             name (str): The name of the destination.
             instance_api_url (str): URL to your metabase instance API
-            session_token (Optional[str]): To generate your session token, you need to run the following command: ``` curl -X POST \   -H "Content-Type: application/json" \   -d '{"username": "person@metabase.com", "password": "fakepassword"}' \   http://localhost:3000/api/session ``` Then copy the value of the `id` field returned by a successful call to that API. Note that by default, sessions are good for 14 days and needs to be regenerated.
+            session_token (Optional[str]): To generate your session token, you need to run the following command: ``` curl -X POST \\   -H "Content-Type: application/json" \\   -d '{"username": "person@metabase.com", "password": "fakepassword"}' \\   http://localhost:3000/api/session ``` Then copy the value of the `id` field returned by a successful call to that API. Note that by default, sessions are good for 14 days and needs to be regenerated.
         """
         self.instance_api_url = check.str_param(instance_api_url, "instance_api_url")
         self.username = check.opt_str_param(username, "username")
