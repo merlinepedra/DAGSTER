@@ -2038,7 +2038,7 @@ class CloseComSource(GeneratedAirbyteSource):
 
         Args:
             name (str): The name of the destination.
-            api_key (str): Close.com API key (usually starts with 'api\_'; find yours here).
+            api_key (str): Close.com API key (usually starts with 'api\\_'; find yours here).
             start_date (Optional[str]): The start date to sync data. Leave blank for full sync. Format: YYYY-MM-DD.
         """
         self.api_key = check.str_param(api_key, "api_key")
@@ -2154,7 +2154,7 @@ class ElasticsearchSource(GeneratedAirbyteSource):
         Args:
             name (str): The name of the destination.
             endpoint (str): The full url of the Elasticsearch server
-            authenticationMethod (Union[None\_, ApiKeySecret, UsernamePassword]): The type of authentication to be used
+            authenticationMethod (Union[None\\_, ApiKeySecret, UsernamePassword]): The type of authentication to be used
         """
         self.endpoint = check.str_param(endpoint, "endpoint")
         self.authenticationMethod = check.inst_param(
@@ -3205,8 +3205,8 @@ class StripeSource(GeneratedAirbyteSource):
 
         Args:
             name (str): The name of the destination.
-            account_id (str): Your Stripe account ID (starts with 'acct\_', find yours here).
-            client_secret (str): Stripe API key (usually starts with 'sk_live\_'; find yours here).
+            account_id (str): Your Stripe account ID (starts with 'acct\\_', find yours here).
+            client_secret (str): Stripe API key (usually starts with 'sk_live\\_'; find yours here).
             start_date (str): UTC date and time in the format 2017-01-25T00:00:00Z. Only data generated after this date will be replicated.
             lookback_window_days (Optional[int]): When set, the connector will always re-export data from the past N days, where N is the value set here. This is useful if your data is frequently updated after creation. More info here
             slice_range (Optional[int]): The time increment used by the connector when requesting data from the Stripe API. The bigger the value is, the less requests will be made and faster the sync will be. On the other hand, the more seldom the state is persisted.
@@ -3776,7 +3776,7 @@ class PaystackSource(GeneratedAirbyteSource):
 
         Args:
             name (str): The name of the destination.
-            secret_key (str): The Paystack API key (usually starts with 'sk_live\_'; find yours here).
+            secret_key (str): The Paystack API key (usually starts with 'sk_live\\_'; find yours here).
             start_date (str): UTC date and time in the format 2017-01-25T00:00:00Z. Any data before this date will not be replicated.
             lookback_window_days (Optional[int]): When set, the connector will always reload data from the past N days, where N is the value set here. This is useful if your data is updated after creation.
         """

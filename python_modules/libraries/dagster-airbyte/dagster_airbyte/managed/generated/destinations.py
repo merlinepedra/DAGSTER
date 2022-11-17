@@ -544,7 +544,7 @@ class ElasticsearchDestination(GeneratedAirbyteDestination):
             name (str): The name of the destination.
             endpoint (str): The full url of the Elasticsearch server
             upsert (Optional[bool]): If a primary key identifier is defined in the source, an upsert will be performed using the primary key value as the elasticsearch doc id. Does not support composite primary keys.
-            authenticationMethod (Union[None\_, ApiKeySecret, UsernamePassword]): The type of authentication to be used
+            authenticationMethod (Union[None\\_, ApiKeySecret, UsernamePassword]): The type of authentication to be used
         """
         self.endpoint = check.str_param(endpoint, "endpoint")
         self.upsert = check.opt_bool_param(upsert, "upsert")
@@ -1171,7 +1171,7 @@ class MongodbDestination(GeneratedAirbyteDestination):
             name (str): The name of the destination.
             instance_type (Union[StandaloneMongoDbInstance, ReplicaSet, MongoDBAtlas]): MongoDb instance to connect to. For MongoDB Atlas and Replica Set TLS connection is used by default.
             database (str): Name of the database.
-            auth_type (Union[None\_, LoginPassword]): Authorization type.
+            auth_type (Union[None\\_, LoginPassword]): Authorization type.
         """
         self.instance_type = check.inst_param(
             instance_type,
