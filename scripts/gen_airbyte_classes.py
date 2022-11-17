@@ -250,6 +250,7 @@ def get_class_definitions(name: str, schema: dict) -> Dict[str, Dict[str, Schema
 
 CLASS_TEMPLATE = """
 class {cls_name}:
+    @public
     def __init__(self, {fields_in}):
 {self_fields}
 """
@@ -257,6 +258,7 @@ class {cls_name}:
 
 SOURCE_TEMPLATE = '''
 class {cls_name}(GeneratedAirbyteSource): {nested_defs}
+    @public
     def __init__(self, name: str, {fields_in}):
         """
         Airbyte Source for {human_readable_name}
@@ -269,6 +271,7 @@ class {cls_name}(GeneratedAirbyteSource): {nested_defs}
 
 DESTINATION_TEMPLATE = '''
 class {cls_name}(GeneratedAirbyteDestination): {nested_defs}
+    @public
     def __init__(self, name: str, {fields_in}):
         """
         Airbyte Destination for {human_readable_name}
@@ -472,6 +475,7 @@ from typing import Any, List, Optional, Union
 
 from dagster_airbyte.managed.types import {imp}
 
+from dagster._annotations import public
 import dagster._check as check
 
 

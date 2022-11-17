@@ -3,10 +3,12 @@ from typing import Any, List, Optional, Union
 
 from dagster_airbyte.managed.types import GeneratedAirbyteDestination
 
+from dagster._annotations import public
 import dagster._check as check
 
 
 class DynamodbDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -33,18 +35,21 @@ class DynamodbDestination(GeneratedAirbyteDestination):
 
 class BigqueryDestination(GeneratedAirbyteDestination):
     class StandardInserts:
+        @public
         def __init__(
             self,
         ):
             self.method = "Standard"
 
     class HMACKey:
+        @public
         def __init__(self, hmac_key_access_id: str, hmac_key_secret: str):
             self.credential_type = "HMAC_KEY"
             self.hmac_key_access_id = check.str_param(hmac_key_access_id, "hmac_key_access_id")
             self.hmac_key_secret = check.str_param(hmac_key_secret, "hmac_key_secret")
 
     class GCSStaging:
+        @public
         def __init__(
             self,
             credential: "BigqueryDestination.HMACKey",
@@ -62,6 +67,7 @@ class BigqueryDestination(GeneratedAirbyteDestination):
                 keep_files_in_gcs_bucket, "keep_files_in_gcs_bucket"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -97,6 +103,7 @@ class BigqueryDestination(GeneratedAirbyteDestination):
 
 
 class RabbitmqDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -126,6 +133,7 @@ class RabbitmqDestination(GeneratedAirbyteDestination):
 
 
 class KvdbDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, bucket_id: str, secret_key: str):
         """
         Airbyte Destination for Kvdb
@@ -138,6 +146,7 @@ class KvdbDestination(GeneratedAirbyteDestination):
 
 
 class ClickhouseDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -165,6 +174,7 @@ class ClickhouseDestination(GeneratedAirbyteDestination):
 
 
 class AmazonSqsDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -192,6 +202,7 @@ class AmazonSqsDestination(GeneratedAirbyteDestination):
 
 
 class MariadbColumnstoreDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -217,6 +228,7 @@ class MariadbColumnstoreDestination(GeneratedAirbyteDestination):
 
 
 class KinesisDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -243,16 +255,19 @@ class KinesisDestination(GeneratedAirbyteDestination):
 
 class AzureBlobStorageDestination(GeneratedAirbyteDestination):
     class CSVCommaSeparatedValues:
+        @public
         def __init__(self, flattening: str):
             self.format_type = "CSV"
             self.flattening = check.str_param(flattening, "flattening")
 
     class JSONLinesNewlineDelimitedJSON:
+        @public
         def __init__(
             self,
         ):
             self.format_type = "JSONL"
 
+    @public
     def __init__(
         self,
         name: str,
@@ -296,21 +311,25 @@ class AzureBlobStorageDestination(GeneratedAirbyteDestination):
 
 class KafkaDestination(GeneratedAirbyteDestination):
     class PLAINTEXT:
+        @public
         def __init__(self, security_protocol: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
 
     class SASLPLAINTEXT:
+        @public
         def __init__(self, security_protocol: str, sasl_mechanism: str, sasl_jaas_config: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
             self.sasl_mechanism = check.str_param(sasl_mechanism, "sasl_mechanism")
             self.sasl_jaas_config = check.str_param(sasl_jaas_config, "sasl_jaas_config")
 
     class SASLSSL:
+        @public
         def __init__(self, security_protocol: str, sasl_mechanism: str, sasl_jaas_config: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
             self.sasl_mechanism = check.str_param(sasl_mechanism, "sasl_mechanism")
             self.sasl_jaas_config = check.str_param(sasl_jaas_config, "sasl_jaas_config")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -381,23 +400,27 @@ class KafkaDestination(GeneratedAirbyteDestination):
 
 class ElasticsearchDestination(GeneratedAirbyteDestination):
     class None_:
+        @public
         def __init__(
             self,
         ):
             self.method = "none"
 
     class ApiKeySecret:
+        @public
         def __init__(self, apiKeyId: str, apiKeySecret: str):
             self.method = "secret"
             self.apiKeyId = check.str_param(apiKeyId, "apiKeyId")
             self.apiKeySecret = check.str_param(apiKeySecret, "apiKeySecret")
 
     class UsernamePassword:
+        @public
         def __init__(self, username: str, password: str):
             self.method = "basic"
             self.username = check.str_param(username, "username")
             self.password = check.str_param(password, "password")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -425,6 +448,7 @@ class ElasticsearchDestination(GeneratedAirbyteDestination):
 
 
 class MysqlDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -452,6 +476,7 @@ class MysqlDestination(GeneratedAirbyteDestination):
 
 
 class SftpJsonDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -476,30 +501,36 @@ class SftpJsonDestination(GeneratedAirbyteDestination):
 
 class GcsDestination(GeneratedAirbyteDestination):
     class HMACKey:
+        @public
         def __init__(self, credential_type: str, hmac_key_access_id: str, hmac_key_secret: str):
             self.credential_type = check.str_param(credential_type, "credential_type")
             self.hmac_key_access_id = check.str_param(hmac_key_access_id, "hmac_key_access_id")
             self.hmac_key_secret = check.str_param(hmac_key_secret, "hmac_key_secret")
 
     class NoCompression:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class Deflate:
+        @public
         def __init__(self, codec: str, compression_level: Optional[int] = None):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.opt_int_param(compression_level, "compression_level")
 
     class Bzip2:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class Xz:
+        @public
         def __init__(self, codec: str, compression_level: Optional[int] = None):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.opt_int_param(compression_level, "compression_level")
 
     class Zstandard:
+        @public
         def __init__(
             self,
             codec: str,
@@ -511,10 +542,12 @@ class GcsDestination(GeneratedAirbyteDestination):
             self.include_checksum = check.opt_bool_param(include_checksum, "include_checksum")
 
     class Snappy:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class AvroApacheAvro:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -542,10 +575,12 @@ class GcsDestination(GeneratedAirbyteDestination):
             )
 
     class GZIP:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class CSVCommaSeparatedValues:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -559,6 +594,7 @@ class GcsDestination(GeneratedAirbyteDestination):
             )
 
     class JSONLinesNewlineDelimitedJSON:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -570,6 +606,7 @@ class GcsDestination(GeneratedAirbyteDestination):
             )
 
     class ParquetColumnarStorage:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -594,6 +631,7 @@ class GcsDestination(GeneratedAirbyteDestination):
                 dictionary_encoding, "dictionary_encoding"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -631,6 +669,7 @@ class GcsDestination(GeneratedAirbyteDestination):
 
 
 class CassandraDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -659,12 +698,14 @@ class CassandraDestination(GeneratedAirbyteDestination):
 
 class FireboltDestination(GeneratedAirbyteDestination):
     class SQLInserts:
+        @public
         def __init__(
             self,
         ):
             self.method = "SQL"
 
     class ExternalTableViaS3:
+        @public
         def __init__(self, s3_bucket: str, s3_region: str, aws_key_id: str, aws_key_secret: str):
             self.method = "S3"
             self.s3_bucket = check.str_param(s3_bucket, "s3_bucket")
@@ -672,6 +713,7 @@ class FireboltDestination(GeneratedAirbyteDestination):
             self.aws_key_id = check.str_param(aws_key_id, "aws_key_id")
             self.aws_key_secret = check.str_param(aws_key_secret, "aws_key_secret")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -704,11 +746,13 @@ class FireboltDestination(GeneratedAirbyteDestination):
 
 class GoogleSheetsDestination(GeneratedAirbyteDestination):
     class AuthenticationViaGoogleOAuth:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.client_id = check.str_param(client_id, "client_id")
             self.client_secret = check.str_param(client_secret, "client_secret")
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
+    @public
     def __init__(self, name: str, spreadsheet_id: str, credentials: AuthenticationViaGoogleOAuth):
         """
         Airbyte Destination for Google Sheets
@@ -724,6 +768,7 @@ class GoogleSheetsDestination(GeneratedAirbyteDestination):
 
 class DatabricksDestination(GeneratedAirbyteDestination):
     class AmazonS3:
+        @public
         def __init__(
             self,
             data_source_type: str,
@@ -745,6 +790,7 @@ class DatabricksDestination(GeneratedAirbyteDestination):
             self.file_name_pattern = check.opt_str_param(file_name_pattern, "file_name_pattern")
 
     class AzureBlobStorage:
+        @public
         def __init__(
             self,
             data_source_type: str,
@@ -767,6 +813,7 @@ class DatabricksDestination(GeneratedAirbyteDestination):
                 azure_blob_storage_sas_token, "azure_blob_storage_sas_token"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -805,18 +852,21 @@ class DatabricksDestination(GeneratedAirbyteDestination):
 
 class BigqueryDenormalizedDestination(GeneratedAirbyteDestination):
     class StandardInserts:
+        @public
         def __init__(
             self,
         ):
             self.method = "Standard"
 
     class HMACKey:
+        @public
         def __init__(self, hmac_key_access_id: str, hmac_key_secret: str):
             self.credential_type = "HMAC_KEY"
             self.hmac_key_access_id = check.str_param(hmac_key_access_id, "hmac_key_access_id")
             self.hmac_key_secret = check.str_param(hmac_key_secret, "hmac_key_secret")
 
     class GCSStaging:
+        @public
         def __init__(
             self,
             credential: "BigqueryDenormalizedDestination.HMACKey",
@@ -834,6 +884,7 @@ class BigqueryDenormalizedDestination(GeneratedAirbyteDestination):
                 keep_files_in_gcs_bucket, "keep_files_in_gcs_bucket"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -868,6 +919,7 @@ class BigqueryDenormalizedDestination(GeneratedAirbyteDestination):
 
 
 class SqliteDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, destination_path: str):
         """
         Airbyte Destination for Sqlite
@@ -880,6 +932,7 @@ class SqliteDestination(GeneratedAirbyteDestination):
 
 class MongodbDestination(GeneratedAirbyteDestination):
     class StandaloneMongoDbInstance:
+        @public
         def __init__(self, instance: str, host: str, port: int, tls: Optional[bool] = None):
             self.instance = check.str_param(instance, "instance")
             self.host = check.str_param(host, "host")
@@ -887,28 +940,33 @@ class MongodbDestination(GeneratedAirbyteDestination):
             self.tls = check.opt_bool_param(tls, "tls")
 
     class ReplicaSet:
+        @public
         def __init__(self, instance: str, server_addresses: str, replica_set: Optional[str] = None):
             self.instance = check.str_param(instance, "instance")
             self.server_addresses = check.str_param(server_addresses, "server_addresses")
             self.replica_set = check.opt_str_param(replica_set, "replica_set")
 
     class MongoDBAtlas:
+        @public
         def __init__(self, instance: str, cluster_url: str):
             self.instance = check.str_param(instance, "instance")
             self.cluster_url = check.str_param(cluster_url, "cluster_url")
 
     class None_:
+        @public
         def __init__(
             self,
         ):
             self.authorization = "none"
 
     class LoginPassword:
+        @public
         def __init__(self, username: str, password: str):
             self.authorization = "login/password"
             self.username = check.str_param(username, "username")
             self.password = check.str_param(password, "password")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -938,6 +996,7 @@ class MongodbDestination(GeneratedAirbyteDestination):
 
 
 class RocksetDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, api_key: str, workspace: str, api_server: Optional[str] = None):
         """
         Airbyte Destination for Rockset
@@ -952,12 +1011,14 @@ class RocksetDestination(GeneratedAirbyteDestination):
 
 class OracleDestination(GeneratedAirbyteDestination):
     class Unencrypted:
+        @public
         def __init__(
             self,
         ):
             self.encryption_method = "unencrypted"
 
     class NativeNetworkEncryptionNNE:
+        @public
         def __init__(self, encryption_algorithm: Optional[str] = None):
             self.encryption_method = "client_nne"
             self.encryption_algorithm = check.opt_str_param(
@@ -965,10 +1026,12 @@ class OracleDestination(GeneratedAirbyteDestination):
             )
 
     class TLSEncryptedVerifyCertificate:
+        @public
         def __init__(self, ssl_certificate: str):
             self.encryption_method = "encrypted_verify_certificate"
             self.ssl_certificate = check.str_param(ssl_certificate, "ssl_certificate")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1006,6 +1069,7 @@ class OracleDestination(GeneratedAirbyteDestination):
 
 
 class CsvDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, destination_path: str):
         """
         Airbyte Destination for Csv
@@ -1018,24 +1082,29 @@ class CsvDestination(GeneratedAirbyteDestination):
 
 class S3Destination(GeneratedAirbyteDestination):
     class NoCompression:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class Deflate:
+        @public
         def __init__(self, codec: str, compression_level: int):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.int_param(compression_level, "compression_level")
 
     class Bzip2:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class Xz:
+        @public
         def __init__(self, codec: str, compression_level: int):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.int_param(compression_level, "compression_level")
 
     class Zstandard:
+        @public
         def __init__(
             self, codec: str, compression_level: int, include_checksum: Optional[bool] = None
         ):
@@ -1044,10 +1113,12 @@ class S3Destination(GeneratedAirbyteDestination):
             self.include_checksum = check.opt_bool_param(include_checksum, "include_checksum")
 
     class Snappy:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class AvroApacheAvro:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1075,10 +1146,12 @@ class S3Destination(GeneratedAirbyteDestination):
             )
 
     class GZIP:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class CSVCommaSeparatedValues:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1092,6 +1165,7 @@ class S3Destination(GeneratedAirbyteDestination):
             )
 
     class JSONLinesNewlineDelimitedJSON:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1103,6 +1177,7 @@ class S3Destination(GeneratedAirbyteDestination):
             )
 
     class ParquetColumnarStorage:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1127,6 +1202,7 @@ class S3Destination(GeneratedAirbyteDestination):
                 dictionary_encoding, "dictionary_encoding"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1173,11 +1249,13 @@ class S3Destination(GeneratedAirbyteDestination):
 
 class AwsDatalakeDestination(GeneratedAirbyteDestination):
     class IAMRole:
+        @public
         def __init__(self, role_arn: str):
             self.credentials_title = "IAM Role"
             self.role_arn = check.str_param(role_arn, "role_arn")
 
     class IAMUser:
+        @public
         def __init__(self, aws_access_key_id: str, aws_secret_access_key: str):
             self.credentials_title = "IAM User"
             self.aws_access_key_id = check.str_param(aws_access_key_id, "aws_access_key_id")
@@ -1185,6 +1263,7 @@ class AwsDatalakeDestination(GeneratedAirbyteDestination):
                 aws_secret_access_key, "aws_secret_access_key"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1217,24 +1296,28 @@ class AwsDatalakeDestination(GeneratedAirbyteDestination):
 
 class MssqlDestination(GeneratedAirbyteDestination):
     class Unencrypted:
+        @public
         def __init__(
             self,
         ):
             self.ssl_method = "unencrypted"
 
     class EncryptedTrustServerCertificate:
+        @public
         def __init__(
             self,
         ):
             self.ssl_method = "encrypted_trust_server_certificate"
 
     class EncryptedVerifyCertificate:
+        @public
         def __init__(self, hostNameInCertificate: Optional[str] = None):
             self.ssl_method = "encrypted_verify_certificate"
             self.hostNameInCertificate = check.opt_str_param(
                 hostNameInCertificate, "hostNameInCertificate"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1272,6 +1355,7 @@ class MssqlDestination(GeneratedAirbyteDestination):
 
 
 class PubsubDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, project_id: str, topic_id: str, credentials_json: str):
         """
         Airbyte Destination for Pubsub
@@ -1286,24 +1370,29 @@ class PubsubDestination(GeneratedAirbyteDestination):
 
 class R2Destination(GeneratedAirbyteDestination):
     class NoCompression:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class Deflate:
+        @public
         def __init__(self, codec: str, compression_level: int):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.int_param(compression_level, "compression_level")
 
     class Bzip2:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class Xz:
+        @public
         def __init__(self, codec: str, compression_level: int):
             self.codec = check.str_param(codec, "codec")
             self.compression_level = check.int_param(compression_level, "compression_level")
 
     class Zstandard:
+        @public
         def __init__(
             self, codec: str, compression_level: int, include_checksum: Optional[bool] = None
         ):
@@ -1312,10 +1401,12 @@ class R2Destination(GeneratedAirbyteDestination):
             self.include_checksum = check.opt_bool_param(include_checksum, "include_checksum")
 
     class Snappy:
+        @public
         def __init__(self, codec: str):
             self.codec = check.str_param(codec, "codec")
 
     class AvroApacheAvro:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1343,10 +1434,12 @@ class R2Destination(GeneratedAirbyteDestination):
             )
 
     class GZIP:
+        @public
         def __init__(self, compression_type: Optional[str] = None):
             self.compression_type = check.opt_str_param(compression_type, "compression_type")
 
     class CSVCommaSeparatedValues:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1360,6 +1453,7 @@ class R2Destination(GeneratedAirbyteDestination):
             )
 
     class JSONLinesNewlineDelimitedJSON:
+        @public
         def __init__(
             self,
             format_type: str,
@@ -1370,6 +1464,7 @@ class R2Destination(GeneratedAirbyteDestination):
                 compression, "compression", (R2Destination.NoCompression, R2Destination.GZIP)
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1407,6 +1502,7 @@ class R2Destination(GeneratedAirbyteDestination):
 
 
 class JdbcDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -1428,6 +1524,7 @@ class JdbcDestination(GeneratedAirbyteDestination):
 
 
 class KeenDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self, name: str, project_id: str, api_key: str, infer_timestamp: Optional[bool] = None
     ):
@@ -1443,6 +1540,7 @@ class KeenDestination(GeneratedAirbyteDestination):
 
 
 class TidbDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -1470,6 +1568,7 @@ class TidbDestination(GeneratedAirbyteDestination):
 
 
 class FirestoreDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, project_id: str, credentials_json: Optional[str] = None):
         """
         Airbyte Destination for Firestore
@@ -1482,6 +1581,7 @@ class FirestoreDestination(GeneratedAirbyteDestination):
 
 
 class ScyllaDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -1507,6 +1607,7 @@ class ScyllaDestination(GeneratedAirbyteDestination):
 
 
 class RedisDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self, name: str, host: str, port: int, username: str, password: str, cache_type: str
     ):
@@ -1524,6 +1625,7 @@ class RedisDestination(GeneratedAirbyteDestination):
 
 
 class MqttDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -1566,23 +1668,27 @@ class MqttDestination(GeneratedAirbyteDestination):
 
 class RedshiftDestination(GeneratedAirbyteDestination):
     class Standard:
+        @public
         def __init__(
             self,
         ):
             self.method = "Standard"
 
     class NoEncryption:
+        @public
         def __init__(
             self,
         ):
             self.encryption_type = "none"
 
     class AESCBCEnvelopeEncryption:
+        @public
         def __init__(self, key_encrypting_key: Optional[str] = None):
             self.encryption_type = "aes_cbc_envelope"
             self.key_encrypting_key = check.opt_str_param(key_encrypting_key, "key_encrypting_key")
 
     class S3Staging:
+        @public
         def __init__(
             self,
             s3_bucket_name: str,
@@ -1610,6 +1716,7 @@ class RedshiftDestination(GeneratedAirbyteDestination):
                 (RedshiftDestination.NoEncryption, RedshiftDestination.AESCBCEnvelopeEncryption),
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1643,6 +1750,7 @@ class RedshiftDestination(GeneratedAirbyteDestination):
 
 
 class PulsarDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(
         self,
         name: str,
@@ -1695,6 +1803,7 @@ class PulsarDestination(GeneratedAirbyteDestination):
 
 class SnowflakeDestination(GeneratedAirbyteDestination):
     class OAuth20:
+        @public
         def __init__(
             self,
             access_token: str,
@@ -1710,6 +1819,7 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class KeyPairAuthentication:
+        @public
         def __init__(
             self,
             private_key: str,
@@ -1723,29 +1833,35 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
             )
 
     class UsernameAndPassword:
+        @public
         def __init__(self, password: str):
             self.password = check.str_param(password, "password")
 
     class SelectAnotherOption:
+        @public
         def __init__(self, method: str):
             self.method = check.str_param(method, "method")
 
     class RecommendedInternalStaging:
+        @public
         def __init__(self, method: str):
             self.method = check.str_param(method, "method")
 
     class NoEncryption:
+        @public
         def __init__(
             self,
         ):
             self.encryption_type = "none"
 
     class AESCBCEnvelopeEncryption:
+        @public
         def __init__(self, key_encrypting_key: Optional[str] = None):
             self.encryption_type = "aes_cbc_envelope"
             self.key_encrypting_key = check.opt_str_param(key_encrypting_key, "key_encrypting_key")
 
     class AWSS3Staging:
+        @public
         def __init__(
             self,
             method: str,
@@ -1773,6 +1889,7 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
             self.file_name_pattern = check.opt_str_param(file_name_pattern, "file_name_pattern")
 
     class GoogleCloudStorageStaging:
+        @public
         def __init__(self, method: str, project_id: str, bucket_name: str, credentials_json: str):
             self.method = check.str_param(method, "method")
             self.project_id = check.str_param(project_id, "project_id")
@@ -1780,6 +1897,7 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
             self.credentials_json = check.str_param(credentials_json, "credentials_json")
 
     class AzureBlobStorageStaging:
+        @public
         def __init__(
             self,
             method: str,
@@ -1802,6 +1920,7 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
                 azure_blob_storage_sas_token, "azure_blob_storage_sas_token"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1858,30 +1977,35 @@ class SnowflakeDestination(GeneratedAirbyteDestination):
 
 class PostgresDestination(GeneratedAirbyteDestination):
     class Disable:
+        @public
         def __init__(
             self,
         ):
             self.mode = "disable"
 
     class Allow:
+        @public
         def __init__(
             self,
         ):
             self.mode = "allow"
 
     class Prefer:
+        @public
         def __init__(
             self,
         ):
             self.mode = "prefer"
 
     class Require:
+        @public
         def __init__(
             self,
         ):
             self.mode = "require"
 
     class VerifyCa:
+        @public
         def __init__(self, ca_certificate: str, client_key_password: Optional[str] = None):
             self.mode = "verify-ca"
             self.ca_certificate = check.str_param(ca_certificate, "ca_certificate")
@@ -1890,6 +2014,7 @@ class PostgresDestination(GeneratedAirbyteDestination):
             )
 
     class VerifyFull:
+        @public
         def __init__(
             self,
             ca_certificate: str,
@@ -1905,6 +2030,7 @@ class PostgresDestination(GeneratedAirbyteDestination):
                 client_key_password, "client_key_password"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1947,6 +2073,7 @@ class PostgresDestination(GeneratedAirbyteDestination):
 
 
 class ScaffoldDestinationPythonDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, TODO: Optional[str] = None):
         """
         Airbyte Destination for Scaffold Destination Python
@@ -1958,6 +2085,7 @@ class ScaffoldDestinationPythonDestination(GeneratedAirbyteDestination):
 
 
 class LocalJsonDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, destination_path: str):
         """
         Airbyte Destination for Local Json
@@ -1969,6 +2097,7 @@ class LocalJsonDestination(GeneratedAirbyteDestination):
 
 
 class MeilisearchDestination(GeneratedAirbyteDestination):
+    @public
     def __init__(self, name: str, host: str, api_key: Optional[str] = None):
         """
         Airbyte Destination for Meilisearch

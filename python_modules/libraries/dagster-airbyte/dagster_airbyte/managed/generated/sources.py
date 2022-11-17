@@ -3,10 +3,12 @@ from typing import Any, List, Optional, Union
 
 from dagster_airbyte.managed.types import GeneratedAirbyteSource
 
+from dagster._annotations import public
 import dagster._check as check
 
 
 class StravaSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -32,6 +34,7 @@ class StravaSource(GeneratedAirbyteSource):
 
 
 class AppsflyerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -53,6 +56,7 @@ class AppsflyerSource(GeneratedAirbyteSource):
 
 
 class GoogleWorkspaceAdminReportsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, credentials_json: str, email: str, lookback: Optional[int] = None
     ):
@@ -69,6 +73,7 @@ class GoogleWorkspaceAdminReportsSource(GeneratedAirbyteSource):
 
 class CartSource(GeneratedAirbyteSource):
     class CentralAPIRouter:
+        @public
         def __init__(self, user_name: str, user_secret: str, site_id: str):
             self.auth_type = "CENTRAL_API_ROUTER"
             self.user_name = check.str_param(user_name, "user_name")
@@ -76,11 +81,13 @@ class CartSource(GeneratedAirbyteSource):
             self.site_id = check.str_param(site_id, "site_id")
 
     class SingleStoreAccessToken:
+        @public
         def __init__(self, access_token: str, store_name: str):
             self.auth_type = "SINGLE_STORE_ACCESS_TOKEN"
             self.access_token = check.str_param(access_token, "access_token")
             self.store_name = check.str_param(store_name, "store_name")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -103,6 +110,7 @@ class CartSource(GeneratedAirbyteSource):
 
 class LinkedinAdsSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -116,10 +124,12 @@ class LinkedinAdsSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AccessToken:
+        @public
         def __init__(self, access_token: str, auth_method: Optional[str] = None):
             self.auth_method = check.opt_str_param(auth_method, "auth_method")
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -141,6 +151,7 @@ class LinkedinAdsSource(GeneratedAirbyteSource):
 
 
 class MongodbSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -170,6 +181,7 @@ class MongodbSource(GeneratedAirbyteSource):
 
 
 class TimelySource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, account_id: str, start_date: str, bearer_token: str):
         """
         Airbyte Source for Timely
@@ -183,6 +195,7 @@ class TimelySource(GeneratedAirbyteSource):
 
 
 class StockTickerApiTutorialSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, stock_ticker: str, api_key: str):
         """
         Airbyte Source for Stock Ticker Api Tutorial
@@ -195,6 +208,7 @@ class StockTickerApiTutorialSource(GeneratedAirbyteSource):
 
 
 class WrikeSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, access_token: str, wrike_instance: str, start_date: Optional[str] = None
     ):
@@ -210,6 +224,7 @@ class WrikeSource(GeneratedAirbyteSource):
 
 
 class CommercetoolsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -235,6 +250,7 @@ class CommercetoolsSource(GeneratedAirbyteSource):
 
 
 class GutendexSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -262,6 +278,7 @@ class GutendexSource(GeneratedAirbyteSource):
 
 
 class IterableSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, start_date: str):
         """
         Airbyte Source for Iterable
@@ -274,6 +291,7 @@ class IterableSource(GeneratedAirbyteSource):
 
 
 class QuickbooksSingerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -301,6 +319,7 @@ class QuickbooksSingerSource(GeneratedAirbyteSource):
 
 
 class BigcommerceSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, store_hash: str, access_token: str):
         """
         Airbyte Source for Bigcommerce
@@ -315,11 +334,13 @@ class BigcommerceSource(GeneratedAirbyteSource):
 
 class ShopifySource(GeneratedAirbyteSource):
     class APIPassword:
+        @public
         def __init__(self, api_password: str):
             self.auth_method = "api_password"
             self.api_password = check.str_param(api_password, "api_password")
 
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: Optional[str] = None,
@@ -331,6 +352,7 @@ class ShopifySource(GeneratedAirbyteSource):
             self.client_secret = check.opt_str_param(client_secret, "client_secret")
             self.access_token = check.opt_str_param(access_token, "access_token")
 
+    @public
     def __init__(
         self, name: str, shop: str, credentials: Union[APIPassword, OAuth20], start_date: str
     ):
@@ -348,6 +370,7 @@ class ShopifySource(GeneratedAirbyteSource):
 
 
 class AppstoreSingerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, key_id: str, private_key: str, issuer_id: str, vendor: str, start_date: str
     ):
@@ -365,6 +388,7 @@ class AppstoreSingerSource(GeneratedAirbyteSource):
 
 
 class GreenhouseSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Greenhouse
@@ -376,6 +400,7 @@ class GreenhouseSource(GeneratedAirbyteSource):
 
 
 class ZoomSingerSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, jwt: str):
         """
         Airbyte Source for Zoom Singer
@@ -388,6 +413,7 @@ class ZoomSingerSource(GeneratedAirbyteSource):
 
 class TiktokMarketingSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self, app_id: str, secret: str, access_token: str, auth_type: Optional[str] = None
         ):
@@ -397,11 +423,13 @@ class TiktokMarketingSource(GeneratedAirbyteSource):
             self.access_token = check.str_param(access_token, "access_token")
 
     class SandboxAccessToken:
+        @public
         def __init__(self, advertiser_id: str, access_token: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.advertiser_id = check.str_param(advertiser_id, "advertiser_id")
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -428,6 +456,7 @@ class TiktokMarketingSource(GeneratedAirbyteSource):
 
 class ZendeskChatSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: Optional[str] = None,
@@ -442,10 +471,12 @@ class ZendeskChatSource(GeneratedAirbyteSource):
             self.refresh_token = check.opt_str_param(refresh_token, "refresh_token")
 
     class AccessToken:
+        @public
         def __init__(self, access_token: str):
             self.credentials = "access_token"
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -467,6 +498,7 @@ class ZendeskChatSource(GeneratedAirbyteSource):
 
 
 class AwsCloudtrailSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, aws_key_id: str, aws_secret_key: str, aws_region_name: str, start_date: str
     ):
@@ -484,6 +516,7 @@ class AwsCloudtrailSource(GeneratedAirbyteSource):
 
 class OktaSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.auth_type = "oauth2.0"
             self.client_id = check.str_param(client_id, "client_id")
@@ -491,10 +524,12 @@ class OktaSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class APIToken:
+        @public
         def __init__(self, api_token: str):
             self.auth_type = "api_token"
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -516,6 +551,7 @@ class OktaSource(GeneratedAirbyteSource):
 
 
 class InsightlySource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, token: Optional[str] = None, start_date: Optional[str] = None):
         """
         Airbyte Source for Insightly
@@ -529,6 +565,7 @@ class InsightlySource(GeneratedAirbyteSource):
 
 class LinkedinPagesSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -542,10 +579,12 @@ class LinkedinPagesSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AccessToken:
+        @public
         def __init__(self, access_token: str, auth_method: Optional[str] = None):
             self.auth_method = check.opt_str_param(auth_method, "auth_method")
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(self, name: str, org_id: int, credentials: Union[OAuth20, AccessToken]):
         """
         Airbyte Source for Linkedin Pages
@@ -562,6 +601,7 @@ class LinkedinPagesSource(GeneratedAirbyteSource):
 
 
 class PersistiqSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Persistiq
@@ -573,6 +613,7 @@ class PersistiqSource(GeneratedAirbyteSource):
 
 
 class FreshcallerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -596,6 +637,7 @@ class FreshcallerSource(GeneratedAirbyteSource):
 
 
 class AppfollowSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, ext_id: str, cid: str, api_secret: str, country: str):
         """
         Airbyte Source for Appfollow
@@ -610,6 +652,7 @@ class AppfollowSource(GeneratedAirbyteSource):
 
 
 class FacebookPagesSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, access_token: str, page_id: str):
         """
         Airbyte Source for Facebook Pages
@@ -622,6 +665,7 @@ class FacebookPagesSource(GeneratedAirbyteSource):
 
 
 class JiraSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -660,6 +704,7 @@ class JiraSource(GeneratedAirbyteSource):
 
 class GoogleSheetsSource(GeneratedAirbyteSource):
     class AuthenticateViaGoogleOAuth:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.auth_type = "Client"
             self.client_id = check.str_param(client_id, "client_id")
@@ -667,12 +712,14 @@ class GoogleSheetsSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class ServiceAccountKeyAuthentication:
+        @public
         def __init__(self, service_account_info: str):
             self.auth_type = "Service"
             self.service_account_info = check.str_param(
                 service_account_info, "service_account_info"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -699,6 +746,7 @@ class GoogleSheetsSource(GeneratedAirbyteSource):
 
 
 class DockerhubSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, docker_username: str):
         """
         Airbyte Source for Dockerhub
@@ -710,6 +758,7 @@ class DockerhubSource(GeneratedAirbyteSource):
 
 
 class UsCensusSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, query_path: str, api_key: str, query_params: Optional[str] = None
     ):
@@ -725,6 +774,7 @@ class UsCensusSource(GeneratedAirbyteSource):
 
 
 class KustomerSingerSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_token: str, start_date: str):
         """
         Airbyte Source for Kustomer Singer
@@ -737,6 +787,7 @@ class KustomerSingerSource(GeneratedAirbyteSource):
 
 
 class AzureTableSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -758,6 +809,7 @@ class AzureTableSource(GeneratedAirbyteSource):
 
 
 class ScaffoldJavaJdbcSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -785,6 +837,7 @@ class ScaffoldJavaJdbcSource(GeneratedAirbyteSource):
 
 
 class TidbSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -812,6 +865,7 @@ class TidbSource(GeneratedAirbyteSource):
 
 
 class QualarooSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -833,6 +887,7 @@ class QualarooSource(GeneratedAirbyteSource):
 
 
 class YahooFinancePriceSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, tickers: str, interval: Optional[str] = None, range: Optional[str] = None
     ):
@@ -849,6 +904,7 @@ class YahooFinancePriceSource(GeneratedAirbyteSource):
 
 class GoogleAnalyticsV4Source(GeneratedAirbyteSource):
     class AuthenticateViaGoogleOauth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -864,10 +920,12 @@ class GoogleAnalyticsV4Source(GeneratedAirbyteSource):
             self.access_token = check.opt_str_param(access_token, "access_token")
 
     class ServiceAccountKeyAuthentication:
+        @public
         def __init__(self, credentials_json: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.credentials_json = check.str_param(credentials_json, "credentials_json")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -898,6 +956,7 @@ class GoogleAnalyticsV4Source(GeneratedAirbyteSource):
 
 
 class JdbcSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -919,6 +978,7 @@ class JdbcSource(GeneratedAirbyteSource):
 
 
 class FakerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -940,6 +1000,7 @@ class FakerSource(GeneratedAirbyteSource):
 
 
 class TplcentralSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -971,6 +1032,7 @@ class TplcentralSource(GeneratedAirbyteSource):
 
 
 class ClickhouseSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -998,6 +1060,7 @@ class ClickhouseSource(GeneratedAirbyteSource):
 
 
 class FreshserviceSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, domain_name: str, api_key: str, start_date: str):
         """
         Airbyte Source for Freshservice
@@ -1011,6 +1074,7 @@ class FreshserviceSource(GeneratedAirbyteSource):
 
 
 class ZenloopSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1033,22 +1097,26 @@ class ZenloopSource(GeneratedAirbyteSource):
 
 class OracleSource(GeneratedAirbyteSource):
     class ServiceName:
+        @public
         def __init__(self, service_name: str, connection_type: Optional[str] = None):
             self.connection_type = check.opt_str_param(connection_type, "connection_type")
             self.service_name = check.str_param(service_name, "service_name")
 
     class SystemIDSID:
+        @public
         def __init__(self, sid: str, connection_type: Optional[str] = None):
             self.connection_type = check.opt_str_param(connection_type, "connection_type")
             self.sid = check.str_param(sid, "sid")
 
     class Unencrypted:
+        @public
         def __init__(
             self,
         ):
             self.encryption_method = "unencrypted"
 
     class NativeNetworkEncryptionNNE:
+        @public
         def __init__(self, encryption_algorithm: Optional[str] = None):
             self.encryption_method = "client_nne"
             self.encryption_algorithm = check.opt_str_param(
@@ -1056,10 +1124,12 @@ class OracleSource(GeneratedAirbyteSource):
             )
 
     class TLSEncryptedVerifyCertificate:
+        @public
         def __init__(self, ssl_certificate: str):
             self.encryption_method = "encrypted_verify_certificate"
             self.ssl_certificate = check.str_param(ssl_certificate, "ssl_certificate")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1099,6 +1169,7 @@ class OracleSource(GeneratedAirbyteSource):
 
 
 class KlaviyoSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, start_date: str):
         """
         Airbyte Source for Klaviyo
@@ -1112,6 +1183,7 @@ class KlaviyoSource(GeneratedAirbyteSource):
 
 class GoogleDirectorySource(GeneratedAirbyteSource):
     class SignInViaGoogleOAuth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -1125,6 +1197,7 @@ class GoogleDirectorySource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class ServiceAccountKey:
+        @public
         def __init__(
             self, credentials_json: str, email: str, credentials_title: Optional[str] = None
         ):
@@ -1132,6 +1205,7 @@ class GoogleDirectorySource(GeneratedAirbyteSource):
             self.credentials_json = check.str_param(credentials_json, "credentials_json")
             self.email = check.str_param(email, "email")
 
+    @public
     def __init__(self, name: str, credentials: Union[SignInViaGoogleOAuth, ServiceAccountKey]):
         """
         Airbyte Source for Google Directory
@@ -1147,6 +1221,7 @@ class GoogleDirectorySource(GeneratedAirbyteSource):
 
 
 class InstagramSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, access_token: str):
         """
         Airbyte Source for Instagram
@@ -1159,6 +1234,7 @@ class InstagramSource(GeneratedAirbyteSource):
 
 
 class ShortioSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, domain_id: str, secret_key: str, start_date: str):
         """
         Airbyte Source for Shortio
@@ -1173,6 +1249,7 @@ class ShortioSource(GeneratedAirbyteSource):
 
 class SquareSource(GeneratedAirbyteSource):
     class OauthAuthentication:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.auth_type = "Oauth"
             self.client_id = check.str_param(client_id, "client_id")
@@ -1180,10 +1257,12 @@ class SquareSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class APIKey:
+        @public
         def __init__(self, api_key: str):
             self.auth_type = "Apikey"
             self.api_key = check.str_param(api_key, "api_key")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1209,6 +1288,7 @@ class SquareSource(GeneratedAirbyteSource):
 
 
 class DelightedSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, since: str, api_key: str):
         """
         Airbyte Source for Delighted
@@ -1221,6 +1301,7 @@ class DelightedSource(GeneratedAirbyteSource):
 
 
 class AmazonSqsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1255,11 +1336,13 @@ class AmazonSqsSource(GeneratedAirbyteSource):
 
 class YoutubeAnalyticsSource(GeneratedAirbyteSource):
     class AuthenticateViaOAuth20:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.client_id = check.str_param(client_id, "client_id")
             self.client_secret = check.str_param(client_secret, "client_secret")
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
+    @public
     def __init__(self, name: str, credentials: AuthenticateViaOAuth20):
         """
         Airbyte Source for Youtube Analytics
@@ -1273,6 +1356,7 @@ class YoutubeAnalyticsSource(GeneratedAirbyteSource):
 
 
 class ScaffoldSourcePythonSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, fix_me: Optional[str] = None):
         """
         Airbyte Source for Scaffold Source Python
@@ -1284,6 +1368,7 @@ class ScaffoldSourcePythonSource(GeneratedAirbyteSource):
 
 
 class LookerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1305,6 +1390,7 @@ class LookerSource(GeneratedAirbyteSource):
 
 
 class GitlabSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1328,6 +1414,7 @@ class GitlabSource(GeneratedAirbyteSource):
 
 
 class ExchangeRatesSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1349,6 +1436,7 @@ class ExchangeRatesSource(GeneratedAirbyteSource):
 
 
 class AmazonAdsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1385,14 +1473,17 @@ class AmazonAdsSource(GeneratedAirbyteSource):
 
 class MixpanelSource(GeneratedAirbyteSource):
     class ServiceAccount:
+        @public
         def __init__(self, username: str, secret: str):
             self.username = check.str_param(username, "username")
             self.secret = check.str_param(secret, "secret")
 
     class ProjectSecret:
+        @public
         def __init__(self, api_secret: str):
             self.api_secret = check.str_param(api_secret, "api_secret")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1430,6 +1521,7 @@ class MixpanelSource(GeneratedAirbyteSource):
 
 
 class OrbitSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_token: str, workspace: str, start_date: Optional[str] = None):
         """
         Airbyte Source for Orbit
@@ -1443,6 +1535,7 @@ class OrbitSource(GeneratedAirbyteSource):
 
 
 class AmazonSellerPartnerSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1490,6 +1583,7 @@ class AmazonSellerPartnerSource(GeneratedAirbyteSource):
 
 
 class CourierSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Courier
@@ -1501,6 +1595,7 @@ class CourierSource(GeneratedAirbyteSource):
 
 
 class CloseComSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, start_date: Optional[str] = None):
         """
         Airbyte Source for Close Com
@@ -1513,6 +1608,7 @@ class CloseComSource(GeneratedAirbyteSource):
 
 
 class BingAdsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1540,6 +1636,7 @@ class BingAdsSource(GeneratedAirbyteSource):
 
 
 class PrimetricSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, client_id: str, client_secret: str):
         """
         Airbyte Source for Primetric
@@ -1552,6 +1649,7 @@ class PrimetricSource(GeneratedAirbyteSource):
 
 
 class PivotalTrackerSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_token: str):
         """
         Airbyte Source for Pivotal Tracker
@@ -1564,23 +1662,27 @@ class PivotalTrackerSource(GeneratedAirbyteSource):
 
 class ElasticsearchSource(GeneratedAirbyteSource):
     class None_:
+        @public
         def __init__(
             self,
         ):
             self.method = "none"
 
     class ApiKeySecret:
+        @public
         def __init__(self, apiKeyId: str, apiKeySecret: str):
             self.method = "secret"
             self.apiKeyId = check.str_param(apiKeyId, "apiKeyId")
             self.apiKeySecret = check.str_param(apiKeySecret, "apiKeySecret")
 
     class UsernamePassword:
+        @public
         def __init__(self, username: str, password: str):
             self.method = "basic"
             self.username = check.str_param(username, "username")
             self.password = check.str_param(password, "password")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1606,6 +1708,7 @@ class ElasticsearchSource(GeneratedAirbyteSource):
 
 
 class BigquerySource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, project_id: str, credentials_json: str, dataset_id: Optional[str] = None
     ):
@@ -1621,6 +1724,7 @@ class BigquerySource(GeneratedAirbyteSource):
 
 
 class WoocommerceSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1646,6 +1750,7 @@ class WoocommerceSource(GeneratedAirbyteSource):
 
 
 class SearchMetricsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, api_key: str, client_secret: str, country_code: str, start_date: str
     ):
@@ -1662,6 +1767,7 @@ class SearchMetricsSource(GeneratedAirbyteSource):
 
 
 class TypeformSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, start_date: str, token: str, form_ids: Optional[List[str]] = None
     ):
@@ -1677,6 +1783,7 @@ class TypeformSource(GeneratedAirbyteSource):
 
 
 class WebflowSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, site_id: str, api_key: str):
         """
         Airbyte Source for Webflow
@@ -1689,6 +1796,7 @@ class WebflowSource(GeneratedAirbyteSource):
 
 
 class FireboltSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1715,17 +1823,20 @@ class FireboltSource(GeneratedAirbyteSource):
 
 class FaunaSource(GeneratedAirbyteSource):
     class Disabled:
+        @public
         def __init__(
             self,
         ):
             self.deletion_mode = "ignore"
 
     class Enabled:
+        @public
         def __init__(self, column: str):
             self.deletion_mode = "deleted_field"
             self.column = check.str_param(column, "column")
 
     class Collection:
+        @public
         def __init__(
             self, page_size: int, deletions: Union["FaunaSource.Disabled", "FaunaSource.Enabled"]
         ):
@@ -1734,6 +1845,7 @@ class FaunaSource(GeneratedAirbyteSource):
                 deletions, "deletions", (FaunaSource.Disabled, FaunaSource.Enabled)
             )
 
+    @public
     def __init__(
         self, name: str, domain: str, port: int, scheme: str, secret: str, collection: Collection
     ):
@@ -1751,6 +1863,7 @@ class FaunaSource(GeneratedAirbyteSource):
 
 
 class IntercomSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, access_token: str):
         """
         Airbyte Source for Intercom
@@ -1763,6 +1876,7 @@ class IntercomSource(GeneratedAirbyteSource):
 
 
 class FreshsalesSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, domain_name: str, api_key: str):
         """
         Airbyte Source for Freshsales
@@ -1775,6 +1889,7 @@ class FreshsalesSource(GeneratedAirbyteSource):
 
 
 class AdjustSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1802,6 +1917,7 @@ class AdjustSource(GeneratedAirbyteSource):
 
 
 class BambooHrSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -1828,6 +1944,7 @@ class BambooHrSource(GeneratedAirbyteSource):
 
 class GoogleAdsSource(GeneratedAirbyteSource):
     class GoogleCredentials:
+        @public
         def __init__(
             self,
             developer_token: str,
@@ -1843,10 +1960,12 @@ class GoogleAdsSource(GeneratedAirbyteSource):
             self.access_token = check.opt_str_param(access_token, "access_token")
 
     class CustomGAQLQueriesEntry:
+        @public
         def __init__(self, query: str, table_name: str):
             self.query = check.str_param(query, "query")
             self.table_name = check.str_param(table_name, "table_name")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1880,6 +1999,7 @@ class GoogleAdsSource(GeneratedAirbyteSource):
 
 
 class HellobatonSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, company: str):
         """
         Airbyte Source for Hellobaton
@@ -1892,6 +2012,7 @@ class HellobatonSource(GeneratedAirbyteSource):
 
 
 class SendgridSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, apikey: str, start_time: Union[int, str]):
         """
         Airbyte Source for Sendgrid
@@ -1905,6 +2026,7 @@ class SendgridSource(GeneratedAirbyteSource):
 
 class MondaySource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -1919,10 +2041,12 @@ class MondaySource(GeneratedAirbyteSource):
             self.access_token = check.str_param(access_token, "access_token")
 
     class APIToken:
+        @public
         def __init__(self, api_token: str):
             self.auth_type = "api_token"
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(self, name: str, credentials: Union[OAuth20, APIToken]):
         """
         Airbyte Source for Monday
@@ -1936,6 +2060,7 @@ class MondaySource(GeneratedAirbyteSource):
 
 
 class DixaSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, api_token: str, start_date: str, batch_size: Optional[int] = None
     ):
@@ -1952,10 +2077,12 @@ class DixaSource(GeneratedAirbyteSource):
 
 class SalesforceSource(GeneratedAirbyteSource):
     class FilterSalesforceObjectsEntry:
+        @public
         def __init__(self, criteria: str, value: str):
             self.criteria = check.str_param(criteria, "criteria")
             self.value = check.str_param(value, "value")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -1986,6 +2113,7 @@ class SalesforceSource(GeneratedAirbyteSource):
 
 class PipedriveSource(GeneratedAirbyteSource):
     class SignInViaPipedriveOAuth:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.auth_type = "Client"
             self.client_id = check.str_param(client_id, "client_id")
@@ -1993,10 +2121,12 @@ class PipedriveSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class APIKeyAuthentication:
+        @public
         def __init__(self, api_token: str):
             self.auth_type = "Token"
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2021,11 +2151,13 @@ class PipedriveSource(GeneratedAirbyteSource):
 
 class FileSource(GeneratedAirbyteSource):
     class HTTPSPublicWeb:
+        @public
         def __init__(self, user_agent: Optional[bool] = None):
             self.storage = "HTTPS"
             self.user_agent = check.opt_bool_param(user_agent, "user_agent")
 
     class GCSGoogleCloudStorage:
+        @public
         def __init__(self, service_account_json: Optional[str] = None):
             self.storage = "GCS"
             self.service_account_json = check.opt_str_param(
@@ -2033,6 +2165,7 @@ class FileSource(GeneratedAirbyteSource):
             )
 
     class S3AmazonWebServices:
+        @public
         def __init__(
             self,
             aws_access_key_id: Optional[str] = None,
@@ -2045,6 +2178,7 @@ class FileSource(GeneratedAirbyteSource):
             )
 
     class AzBlobAzureBlobStorage:
+        @public
         def __init__(
             self,
             storage_account: str,
@@ -2057,6 +2191,7 @@ class FileSource(GeneratedAirbyteSource):
             self.shared_key = check.opt_str_param(shared_key, "shared_key")
 
     class SSHSecureShell:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -2067,6 +2202,7 @@ class FileSource(GeneratedAirbyteSource):
             self.port = check.opt_str_param(port, "port")
 
     class SCPSecureCopyProtocol:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -2077,6 +2213,7 @@ class FileSource(GeneratedAirbyteSource):
             self.port = check.opt_str_param(port, "port")
 
     class SFTPSecureFileTransferProtocol:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -2087,11 +2224,13 @@ class FileSource(GeneratedAirbyteSource):
             self.port = check.opt_str_param(port, "port")
 
     class LocalFilesystemLimited:
+        @public
         def __init__(
             self,
         ):
             self.storage = "local"
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2137,6 +2276,7 @@ class FileSource(GeneratedAirbyteSource):
 
 
 class GlassfrogSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Glassfrog
@@ -2148,6 +2288,7 @@ class GlassfrogSource(GeneratedAirbyteSource):
 
 
 class ChartmogulSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, start_date: str, interval: str):
         """
         Airbyte Source for Chartmogul
@@ -2161,6 +2302,7 @@ class ChartmogulSource(GeneratedAirbyteSource):
 
 
 class OrbSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2190,6 +2332,7 @@ class OrbSource(GeneratedAirbyteSource):
 
 
 class CockroachdbSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2217,6 +2360,7 @@ class CockroachdbSource(GeneratedAirbyteSource):
 
 
 class ConfluenceSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_token: str, domain_name: str, email: str):
         """
         Airbyte Source for Confluence
@@ -2230,6 +2374,7 @@ class ConfluenceSource(GeneratedAirbyteSource):
 
 
 class PlaidSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2253,6 +2398,7 @@ class PlaidSource(GeneratedAirbyteSource):
 
 
 class SnapchatMarketingSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2277,6 +2423,7 @@ class SnapchatMarketingSource(GeneratedAirbyteSource):
 
 class MicrosoftTeamsSource(GeneratedAirbyteSource):
     class AuthenticateViaMicrosoftOAuth20:
+        @public
         def __init__(
             self,
             tenant_id: str,
@@ -2292,6 +2439,7 @@ class MicrosoftTeamsSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AuthenticateViaMicrosoft:
+        @public
         def __init__(
             self,
             tenant_id: str,
@@ -2304,6 +2452,7 @@ class MicrosoftTeamsSource(GeneratedAirbyteSource):
             self.client_id = check.str_param(client_id, "client_id")
             self.client_secret = check.str_param(client_secret, "client_secret")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2329,6 +2478,7 @@ class MicrosoftTeamsSource(GeneratedAirbyteSource):
 
 class LeverHiringSource(GeneratedAirbyteSource):
     class OAuthCredentials:
+        @public
         def __init__(
             self,
             refresh_token: str,
@@ -2341,6 +2491,7 @@ class LeverHiringSource(GeneratedAirbyteSource):
             self.client_secret = check.opt_str_param(client_secret, "client_secret")
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2362,6 +2513,7 @@ class LeverHiringSource(GeneratedAirbyteSource):
 
 
 class TwilioSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2383,6 +2535,7 @@ class TwilioSource(GeneratedAirbyteSource):
 
 
 class StripeSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2409,17 +2562,20 @@ class StripeSource(GeneratedAirbyteSource):
 
 class Db2Source(GeneratedAirbyteSource):
     class Unencrypted:
+        @public
         def __init__(
             self,
         ):
             self.encryption_method = "unencrypted"
 
     class TLSEncryptedVerifyCertificate:
+        @public
         def __init__(self, ssl_certificate: str, key_store_password: Optional[str] = None):
             self.encryption_method = "encrypted_verify_certificate"
             self.ssl_certificate = check.str_param(ssl_certificate, "ssl_certificate")
             self.key_store_password = check.opt_str_param(key_store_password, "key_store_password")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2452,6 +2608,7 @@ class Db2Source(GeneratedAirbyteSource):
 
 class SlackSource(GeneratedAirbyteSource):
     class DefaultOAuth20Authorization:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -2465,9 +2622,11 @@ class SlackSource(GeneratedAirbyteSource):
             self.refresh_token = check.opt_str_param(refresh_token, "refresh_token")
 
     class APITokenCredentials:
+        @public
         def __init__(self, api_token: str):
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2495,6 +2654,7 @@ class SlackSource(GeneratedAirbyteSource):
 
 
 class RechargeSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, access_token: str):
         """
         Airbyte Source for Recharge
@@ -2507,6 +2667,7 @@ class RechargeSource(GeneratedAirbyteSource):
 
 
 class OpenweatherSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2531,6 +2692,7 @@ class OpenweatherSource(GeneratedAirbyteSource):
 
 class RetentlySource(GeneratedAirbyteSource):
     class AuthenticateViaRetentlyOAuth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -2544,10 +2706,12 @@ class RetentlySource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AuthenticateWithAPIToken:
+        @public
         def __init__(self, api_key: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.api_key = check.str_param(api_key, "api_key")
 
+    @public
     def __init__(
         self, name: str, credentials: Union[AuthenticateViaRetentlyOAuth, AuthenticateWithAPIToken]
     ):
@@ -2565,6 +2729,7 @@ class RetentlySource(GeneratedAirbyteSource):
 
 
 class ScaffoldSourceHttpSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, TODO: str):
         """
         Airbyte Source for Scaffold Source Http
@@ -2576,6 +2741,7 @@ class ScaffoldSourceHttpSource(GeneratedAirbyteSource):
 
 
 class YandexMetricaSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, auth_token: str, counter_id: str, start_date: str, end_date: str):
         """
         Airbyte Source for Yandex Metrica
@@ -2590,6 +2756,7 @@ class YandexMetricaSource(GeneratedAirbyteSource):
 
 
 class TalkdeskExploreSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2611,6 +2778,7 @@ class TalkdeskExploreSource(GeneratedAirbyteSource):
 
 
 class ChargifySource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, domain: str):
         """
         Airbyte Source for Chargify
@@ -2623,6 +2791,7 @@ class ChargifySource(GeneratedAirbyteSource):
 
 
 class RkiCovidSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str):
         """
         Airbyte Source for Rki Covid
@@ -2635,30 +2804,35 @@ class RkiCovidSource(GeneratedAirbyteSource):
 
 class PostgresSource(GeneratedAirbyteSource):
     class Disable:
+        @public
         def __init__(
             self,
         ):
             self.mode = "disable"
 
     class Allow:
+        @public
         def __init__(
             self,
         ):
             self.mode = "allow"
 
     class Prefer:
+        @public
         def __init__(
             self,
         ):
             self.mode = "prefer"
 
     class Require:
+        @public
         def __init__(
             self,
         ):
             self.mode = "require"
 
     class VerifyCa:
+        @public
         def __init__(
             self,
             ca_certificate: str,
@@ -2675,6 +2849,7 @@ class PostgresSource(GeneratedAirbyteSource):
             )
 
     class VerifyFull:
+        @public
         def __init__(
             self,
             ca_certificate: str,
@@ -2691,12 +2866,14 @@ class PostgresSource(GeneratedAirbyteSource):
             )
 
     class Standard:
+        @public
         def __init__(
             self,
         ):
             self.method = "Standard"
 
     class LogicalReplicationCDC:
+        @public
         def __init__(
             self,
             replication_slot: str,
@@ -2713,12 +2890,14 @@ class PostgresSource(GeneratedAirbyteSource):
             )
 
     class NoTunnel:
+        @public
         def __init__(
             self,
         ):
             self.tunnel_method = "NO_TUNNEL"
 
     class SSHKeyAuthentication:
+        @public
         def __init__(self, tunnel_host: str, tunnel_port: int, tunnel_user: str, ssh_key: str):
             self.tunnel_method = "SSH_KEY_AUTH"
             self.tunnel_host = check.str_param(tunnel_host, "tunnel_host")
@@ -2727,6 +2906,7 @@ class PostgresSource(GeneratedAirbyteSource):
             self.ssh_key = check.str_param(ssh_key, "ssh_key")
 
     class PasswordAuthentication:
+        @public
         def __init__(
             self, tunnel_host: str, tunnel_port: int, tunnel_user: str, tunnel_user_password: str
         ):
@@ -2738,6 +2918,7 @@ class PostgresSource(GeneratedAirbyteSource):
                 tunnel_user_password, "tunnel_user_password"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2796,6 +2977,7 @@ class PostgresSource(GeneratedAirbyteSource):
 
 
 class TrelloSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2817,6 +2999,7 @@ class TrelloSource(GeneratedAirbyteSource):
 
 
 class PrestashopSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, url: str, access_key: str):
         """
         Airbyte Source for Prestashop
@@ -2829,6 +3012,7 @@ class PrestashopSource(GeneratedAirbyteSource):
 
 
 class PaystackSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -2851,6 +3035,7 @@ class PaystackSource(GeneratedAirbyteSource):
 
 class S3Source(GeneratedAirbyteSource):
     class CSV:
+        @public
         def __init__(
             self,
             filetype: Optional[str] = None,
@@ -2880,6 +3065,7 @@ class S3Source(GeneratedAirbyteSource):
             self.block_size = check.opt_int_param(block_size, "block_size")
 
     class Parquet:
+        @public
         def __init__(
             self,
             filetype: Optional[str] = None,
@@ -2893,10 +3079,12 @@ class S3Source(GeneratedAirbyteSource):
             self.buffer_size = check.opt_int_param(buffer_size, "buffer_size")
 
     class Avro:
+        @public
         def __init__(self, filetype: Optional[str] = None):
             self.filetype = check.opt_str_param(filetype, "filetype")
 
     class Jsonl:
+        @public
         def __init__(
             self,
             filetype: Optional[str] = None,
@@ -2912,6 +3100,7 @@ class S3Source(GeneratedAirbyteSource):
             self.block_size = check.opt_int_param(block_size, "block_size")
 
     class S3AmazonWebServices:
+        @public
         def __init__(
             self,
             bucket: str,
@@ -2928,6 +3117,7 @@ class S3Source(GeneratedAirbyteSource):
             self.path_prefix = check.opt_str_param(path_prefix, "path_prefix")
             self.endpoint = check.opt_str_param(endpoint, "endpoint")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -2954,6 +3144,7 @@ class S3Source(GeneratedAirbyteSource):
 
 class SnowflakeSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -2968,11 +3159,13 @@ class SnowflakeSource(GeneratedAirbyteSource):
             self.refresh_token = check.opt_str_param(refresh_token, "refresh_token")
 
     class UsernameAndPassword:
+        @public
         def __init__(self, username: str, password: str):
             self.auth_type = "username/password"
             self.username = check.str_param(username, "username")
             self.password = check.str_param(password, "password")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3004,6 +3197,7 @@ class SnowflakeSource(GeneratedAirbyteSource):
 
 
 class AmplitudeSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, secret_key: str, start_date: str):
         """
         Airbyte Source for Amplitude
@@ -3017,6 +3211,7 @@ class AmplitudeSource(GeneratedAirbyteSource):
 
 
 class PosthogSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, api_key: str, base_url: Optional[str] = None):
         """
         Airbyte Source for Posthog
@@ -3030,6 +3225,7 @@ class PosthogSource(GeneratedAirbyteSource):
 
 
 class PaypalTransactionSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3054,18 +3250,21 @@ class PaypalTransactionSource(GeneratedAirbyteSource):
 
 class MssqlSource(GeneratedAirbyteSource):
     class Unencrypted:
+        @public
         def __init__(
             self,
         ):
             self.ssl_method = "unencrypted"
 
     class EncryptedTrustServerCertificate:
+        @public
         def __init__(
             self,
         ):
             self.ssl_method = "encrypted_trust_server_certificate"
 
     class EncryptedVerifyCertificate:
+        @public
         def __init__(self, hostNameInCertificate: Optional[str] = None):
             self.ssl_method = "encrypted_verify_certificate"
             self.hostNameInCertificate = check.opt_str_param(
@@ -3073,12 +3272,14 @@ class MssqlSource(GeneratedAirbyteSource):
             )
 
     class Standard:
+        @public
         def __init__(
             self,
         ):
             self.method = "STANDARD"
 
     class LogicalReplicationCDC:
+        @public
         def __init__(
             self, data_to_sync: Optional[str] = None, snapshot_isolation: Optional[str] = None
         ):
@@ -3086,6 +3287,7 @@ class MssqlSource(GeneratedAirbyteSource):
             self.data_to_sync = check.opt_str_param(data_to_sync, "data_to_sync")
             self.snapshot_isolation = check.opt_str_param(snapshot_isolation, "snapshot_isolation")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3129,6 +3331,7 @@ class MssqlSource(GeneratedAirbyteSource):
 
 
 class ZohoCrmSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3156,6 +3359,7 @@ class ZohoCrmSource(GeneratedAirbyteSource):
 
 
 class RedshiftSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3184,17 +3388,20 @@ class RedshiftSource(GeneratedAirbyteSource):
 
 class AsanaSource(GeneratedAirbyteSource):
     class PATCredentials:
+        @public
         def __init__(self, personal_access_token: str):
             self.personal_access_token = check.str_param(
                 personal_access_token, "personal_access_token"
             )
 
     class OAuthCredentials:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.client_id = check.str_param(client_id, "client_id")
             self.client_secret = check.str_param(client_secret, "client_secret")
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
+    @public
     def __init__(self, name: str, credentials: Union[PATCredentials, OAuthCredentials]):
         """
         Airbyte Source for Asana
@@ -3208,6 +3415,7 @@ class AsanaSource(GeneratedAirbyteSource):
 
 
 class SmartsheetsSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3228,6 +3436,7 @@ class SmartsheetsSource(GeneratedAirbyteSource):
 
 class MailchimpSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             access_token: str,
@@ -3240,10 +3449,12 @@ class MailchimpSource(GeneratedAirbyteSource):
             self.access_token = check.str_param(access_token, "access_token")
 
     class APIKey:
+        @public
         def __init__(self, apikey: str):
             self.auth_type = "apikey"
             self.apikey = check.str_param(apikey, "apikey")
 
+    @public
     def __init__(self, name: str, credentials: Union[OAuth20, APIKey]):
         """
         Airbyte Source for Mailchimp
@@ -3257,6 +3468,7 @@ class MailchimpSource(GeneratedAirbyteSource):
 
 
 class SentrySource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3282,6 +3494,7 @@ class SentrySource(GeneratedAirbyteSource):
 
 
 class MailgunSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3301,6 +3514,7 @@ class MailgunSource(GeneratedAirbyteSource):
 
 
 class OnesignalSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, user_auth_key: str, start_date: str, outcome_names: str):
         """
         Airbyte Source for Onesignal
@@ -3314,6 +3528,7 @@ class OnesignalSource(GeneratedAirbyteSource):
 
 
 class PythonHttpTutorialSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, start_date: str, base: str, access_key: Optional[str] = None):
         """
         Airbyte Source for Python Http Tutorial
@@ -3327,6 +3542,7 @@ class PythonHttpTutorialSource(GeneratedAirbyteSource):
 
 
 class AirtableSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, base_id: str, tables: List[str]):
         """
         Airbyte Source for Airtable
@@ -3341,6 +3557,7 @@ class AirtableSource(GeneratedAirbyteSource):
 
 class MongodbV2Source(GeneratedAirbyteSource):
     class StandaloneMongoDbInstance:
+        @public
         def __init__(self, instance: str, host: str, port: int, tls: Optional[bool] = None):
             self.instance = check.str_param(instance, "instance")
             self.host = check.str_param(host, "host")
@@ -3348,16 +3565,19 @@ class MongodbV2Source(GeneratedAirbyteSource):
             self.tls = check.opt_bool_param(tls, "tls")
 
     class ReplicaSet:
+        @public
         def __init__(self, instance: str, server_addresses: str, replica_set: Optional[str] = None):
             self.instance = check.str_param(instance, "instance")
             self.server_addresses = check.str_param(server_addresses, "server_addresses")
             self.replica_set = check.opt_str_param(replica_set, "replica_set")
 
     class MongoDBAtlas:
+        @public
         def __init__(self, instance: str, cluster_url: str):
             self.instance = check.str_param(instance, "instance")
             self.cluster_url = check.str_param(cluster_url, "cluster_url")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3390,11 +3610,13 @@ class MongodbV2Source(GeneratedAirbyteSource):
 
 class FileSecureSource(GeneratedAirbyteSource):
     class HTTPSPublicWeb:
+        @public
         def __init__(self, user_agent: Optional[bool] = None):
             self.storage = "HTTPS"
             self.user_agent = check.opt_bool_param(user_agent, "user_agent")
 
     class GCSGoogleCloudStorage:
+        @public
         def __init__(self, service_account_json: Optional[str] = None):
             self.storage = "GCS"
             self.service_account_json = check.opt_str_param(
@@ -3402,6 +3624,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             )
 
     class S3AmazonWebServices:
+        @public
         def __init__(
             self,
             aws_access_key_id: Optional[str] = None,
@@ -3414,6 +3637,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             )
 
     class AzBlobAzureBlobStorage:
+        @public
         def __init__(
             self,
             storage_account: str,
@@ -3426,6 +3650,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             self.shared_key = check.opt_str_param(shared_key, "shared_key")
 
     class SSHSecureShell:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -3436,6 +3661,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             self.port = check.opt_str_param(port, "port")
 
     class SCPSecureCopyProtocol:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -3446,6 +3672,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             self.port = check.opt_str_param(port, "port")
 
     class SFTPSecureFileTransferProtocol:
+        @public
         def __init__(
             self, user: str, host: str, password: Optional[str] = None, port: Optional[str] = None
         ):
@@ -3455,6 +3682,7 @@ class FileSecureSource(GeneratedAirbyteSource):
             self.host = check.str_param(host, "host")
             self.port = check.opt_str_param(port, "port")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3499,16 +3727,19 @@ class FileSecureSource(GeneratedAirbyteSource):
 
 class ZendeskSupportSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(self, access_token: str, credentials: Optional[str] = None):
             self.credentials = check.opt_str_param(credentials, "credentials")
             self.access_token = check.str_param(access_token, "access_token")
 
     class APIToken:
+        @public
         def __init__(self, email: str, api_token: str, credentials: Optional[str] = None):
             self.credentials = check.opt_str_param(credentials, "credentials")
             self.email = check.str_param(email, "email")
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(
         self, name: str, start_date: str, subdomain: str, credentials: Union[OAuth20, APIToken]
     ):
@@ -3528,6 +3759,7 @@ class ZendeskSupportSource(GeneratedAirbyteSource):
 
 
 class TempoSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_token: str):
         """
         Airbyte Source for Tempo
@@ -3539,6 +3771,7 @@ class TempoSource(GeneratedAirbyteSource):
 
 
 class BraintreeSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3562,6 +3795,7 @@ class BraintreeSource(GeneratedAirbyteSource):
 
 
 class SalesloftSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, client_id: str, client_secret: str, refresh_token: str, start_date: str
     ):
@@ -3578,6 +3812,7 @@ class SalesloftSource(GeneratedAirbyteSource):
 
 
 class LinnworksSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, application_id: str, application_secret: str, token: str, start_date: str
     ):
@@ -3594,6 +3829,7 @@ class LinnworksSource(GeneratedAirbyteSource):
 
 
 class ChargebeeSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, site: str, site_api_key: str, start_date: str, product_catalog: str
     ):
@@ -3611,6 +3847,7 @@ class ChargebeeSource(GeneratedAirbyteSource):
 
 class GoogleAnalyticsDataApiSource(GeneratedAirbyteSource):
     class AuthenticateViaGoogleOauth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -3626,10 +3863,12 @@ class GoogleAnalyticsDataApiSource(GeneratedAirbyteSource):
             self.access_token = check.opt_str_param(access_token, "access_token")
 
     class ServiceAccountKeyAuthentication:
+        @public
         def __init__(self, credentials_json: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.credentials_json = check.str_param(credentials_json, "credentials_json")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3662,6 +3901,7 @@ class GoogleAnalyticsDataApiSource(GeneratedAirbyteSource):
 
 
 class OutreachSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3685,6 +3925,7 @@ class OutreachSource(GeneratedAirbyteSource):
 
 
 class LemlistSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Lemlist
@@ -3696,6 +3937,7 @@ class LemlistSource(GeneratedAirbyteSource):
 
 
 class ApifyDatasetSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, datasetId: str, clean: Optional[bool] = None):
         """
         Airbyte Source for Apify Dataset
@@ -3708,6 +3950,7 @@ class ApifyDatasetSource(GeneratedAirbyteSource):
 
 
 class RecurlySource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3728,16 +3971,19 @@ class RecurlySource(GeneratedAirbyteSource):
 
 class ZendeskTalkSource(GeneratedAirbyteSource):
     class APIToken:
+        @public
         def __init__(self, email: str, api_token: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.email = check.str_param(email, "email")
             self.api_token = check.str_param(api_token, "api_token")
 
     class OAuth20:
+        @public
         def __init__(self, access_token: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(
         self, name: str, subdomain: str, credentials: Union[APIToken, OAuth20], start_date: str
     ):
@@ -3756,15 +4002,18 @@ class ZendeskTalkSource(GeneratedAirbyteSource):
 
 class SftpSource(GeneratedAirbyteSource):
     class PasswordAuthentication:
+        @public
         def __init__(self, auth_user_password: str):
             self.auth_method = "SSH_PASSWORD_AUTH"
             self.auth_user_password = check.str_param(auth_user_password, "auth_user_password")
 
     class SSHKeyAuthentication:
+        @public
         def __init__(self, auth_ssh_key: str):
             self.auth_method = "SSH_KEY_AUTH"
             self.auth_ssh_key = check.str_param(auth_ssh_key, "auth_ssh_key")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -3796,6 +4045,7 @@ class SftpSource(GeneratedAirbyteSource):
 
 
 class WhiskyHunterSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3810,6 +4060,7 @@ class WhiskyHunterSource(GeneratedAirbyteSource):
 
 
 class FreshdeskSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3831,6 +4082,7 @@ class FreshdeskSource(GeneratedAirbyteSource):
 
 
 class GocardlessSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3854,6 +4106,7 @@ class GocardlessSource(GeneratedAirbyteSource):
 
 
 class ZuoraSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3879,6 +4132,7 @@ class ZuoraSource(GeneratedAirbyteSource):
 
 
 class MarketoSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, domain_url: str, client_id: str, client_secret: str, start_date: str
     ):
@@ -3896,6 +4150,7 @@ class MarketoSource(GeneratedAirbyteSource):
 
 class DriftSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -3911,10 +4166,12 @@ class DriftSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AccessToken:
+        @public
         def __init__(self, access_token: str, credentials: Optional[str] = None):
             self.credentials = check.opt_str_param(credentials, "credentials")
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(self, name: str, credentials: Union[OAuth20, AccessToken]):
         """
         Airbyte Source for Drift
@@ -3928,6 +4185,7 @@ class DriftSource(GeneratedAirbyteSource):
 
 
 class PokeapiSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, pokemon_name: str):
         """
         Airbyte Source for Pokeapi
@@ -3939,6 +4197,7 @@ class PokeapiSource(GeneratedAirbyteSource):
 
 
 class NetsuiteSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -3968,6 +4227,7 @@ class NetsuiteSource(GeneratedAirbyteSource):
 
 
 class HubplannerSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str):
         """
         Airbyte Source for Hubplanner
@@ -3980,6 +4240,7 @@ class HubplannerSource(GeneratedAirbyteSource):
 
 class Dv360Source(GeneratedAirbyteSource):
     class Oauth2Credentials:
+        @public
         def __init__(
             self,
             access_token: str,
@@ -3994,6 +4255,7 @@ class Dv360Source(GeneratedAirbyteSource):
             self.client_id = check.str_param(client_id, "client_id")
             self.client_secret = check.str_param(client_secret, "client_secret")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4020,6 +4282,7 @@ class Dv360Source(GeneratedAirbyteSource):
 
 class NotionSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(self, client_id: str, client_secret: str, access_token: str):
             self.auth_type = "OAuth2.0"
             self.client_id = check.str_param(client_id, "client_id")
@@ -4027,10 +4290,12 @@ class NotionSource(GeneratedAirbyteSource):
             self.access_token = check.str_param(access_token, "access_token")
 
     class AccessToken:
+        @public
         def __init__(self, token: str):
             self.auth_type = "token"
             self.token = check.str_param(token, "token")
 
+    @public
     def __init__(self, name: str, start_date: str, credentials: Union[OAuth20, AccessToken]):
         """
         Airbyte Source for Notion
@@ -4046,6 +4311,7 @@ class NotionSource(GeneratedAirbyteSource):
 
 class ZendeskSunshineSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(self, client_id: str, client_secret: str, access_token: str):
             self.auth_method = "oauth2.0"
             self.client_id = check.str_param(client_id, "client_id")
@@ -4053,11 +4319,13 @@ class ZendeskSunshineSource(GeneratedAirbyteSource):
             self.access_token = check.str_param(access_token, "access_token")
 
     class APIToken:
+        @public
         def __init__(self, api_token: str, email: str):
             self.auth_method = "api_token"
             self.api_token = check.str_param(api_token, "api_token")
             self.email = check.str_param(email, "email")
 
+    @public
     def __init__(
         self, name: str, subdomain: str, start_date: str, credentials: Union[OAuth20, APIToken]
     ):
@@ -4078,6 +4346,7 @@ class ZendeskSunshineSource(GeneratedAirbyteSource):
 
 class PinterestSource(GeneratedAirbyteSource):
     class OAuth20:
+        @public
         def __init__(
             self,
             refresh_token: str,
@@ -4090,10 +4359,12 @@ class PinterestSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AccessToken:
+        @public
         def __init__(self, access_token: str):
             self.auth_method = "access_token"
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(self, name: str, start_date: str, credentials: Union[OAuth20, AccessToken]):
         """
         Airbyte Source for Pinterest
@@ -4108,6 +4379,7 @@ class PinterestSource(GeneratedAirbyteSource):
 
 
 class MetabaseSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -4130,6 +4402,7 @@ class MetabaseSource(GeneratedAirbyteSource):
 
 class HubspotSource(GeneratedAirbyteSource):
     class OAuth:
+        @public
         def __init__(self, client_id: str, client_secret: str, refresh_token: str):
             self.credentials_title = "OAuth Credentials"
             self.client_id = check.str_param(client_id, "client_id")
@@ -4137,15 +4410,18 @@ class HubspotSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class APIKey:
+        @public
         def __init__(self, api_key: str):
             self.credentials_title = "API Key Credentials"
             self.api_key = check.str_param(api_key, "api_key")
 
     class PrivateAPP:
+        @public
         def __init__(self, access_token: str):
             self.credentials_title = "Private App Credentials"
             self.access_token = check.str_param(access_token, "access_token")
 
+    @public
     def __init__(self, name: str, start_date: str, credentials: Union[OAuth, APIKey, PrivateAPP]):
         """
         Airbyte Source for Hubspot
@@ -4163,6 +4439,7 @@ class HubspotSource(GeneratedAirbyteSource):
 
 class HarvestSource(GeneratedAirbyteSource):
     class AuthenticateViaHarvestOAuth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -4176,10 +4453,12 @@ class HarvestSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class AuthenticateWithPersonalAccessToken:
+        @public
         def __init__(self, api_token: str, auth_type: Optional[str] = None):
             self.auth_type = check.opt_str_param(auth_type, "auth_type")
             self.api_token = check.str_param(api_token, "api_token")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4209,15 +4488,18 @@ class HarvestSource(GeneratedAirbyteSource):
 
 class GithubSource(GeneratedAirbyteSource):
     class OAuthCredentials:
+        @public
         def __init__(self, access_token: str):
             self.access_token = check.str_param(access_token, "access_token")
 
     class PATCredentials:
+        @public
         def __init__(self, personal_access_token: str):
             self.personal_access_token = check.str_param(
                 personal_access_token, "personal_access_token"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4246,6 +4528,7 @@ class GithubSource(GeneratedAirbyteSource):
 
 class E2eTestSource(GeneratedAirbyteSource):
     class SingleSchema:
+        @public
         def __init__(
             self, stream_name: str, stream_schema: str, stream_duplication: Optional[int] = None
         ):
@@ -4255,10 +4538,12 @@ class E2eTestSource(GeneratedAirbyteSource):
             self.stream_duplication = check.opt_int_param(stream_duplication, "stream_duplication")
 
     class MultiSchema:
+        @public
         def __init__(self, stream_schemas: str):
             self.type = "MULTI_STREAM"
             self.stream_schemas = check.str_param(stream_schemas, "stream_schemas")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4285,18 +4570,21 @@ class E2eTestSource(GeneratedAirbyteSource):
 
 class MysqlSource(GeneratedAirbyteSource):
     class Preferred:
+        @public
         def __init__(
             self,
         ):
             self.mode = "preferred"
 
     class Required:
+        @public
         def __init__(
             self,
         ):
             self.mode = "required"
 
     class VerifyCA:
+        @public
         def __init__(
             self,
             ca_certificate: str,
@@ -4313,6 +4601,7 @@ class MysqlSource(GeneratedAirbyteSource):
             )
 
     class VerifyIdentity:
+        @public
         def __init__(
             self,
             ca_certificate: str,
@@ -4329,12 +4618,14 @@ class MysqlSource(GeneratedAirbyteSource):
             )
 
     class Standard:
+        @public
         def __init__(
             self,
         ):
             self.method = "STANDARD"
 
     class LogicalReplicationCDC:
+        @public
         def __init__(
             self,
             initial_waiting_seconds: Optional[int] = None,
@@ -4346,6 +4637,7 @@ class MysqlSource(GeneratedAirbyteSource):
             )
             self.server_time_zone = check.opt_str_param(server_time_zone, "server_time_zone")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4390,6 +4682,7 @@ class MysqlSource(GeneratedAirbyteSource):
 
 
 class MyHoursSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -4411,6 +4704,7 @@ class MyHoursSource(GeneratedAirbyteSource):
 
 
 class KyribaSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -4435,6 +4729,7 @@ class KyribaSource(GeneratedAirbyteSource):
 
 class GoogleSearchConsoleSource(GeneratedAirbyteSource):
     class OAuth:
+        @public
         def __init__(
             self,
             client_id: str,
@@ -4449,6 +4744,7 @@ class GoogleSearchConsoleSource(GeneratedAirbyteSource):
             self.refresh_token = check.str_param(refresh_token, "refresh_token")
 
     class ServiceAccountKeyAuthentication:
+        @public
         def __init__(self, service_account_info: str, email: str):
             self.auth_type = "Service"
             self.service_account_info = check.str_param(
@@ -4456,6 +4752,7 @@ class GoogleSearchConsoleSource(GeneratedAirbyteSource):
             )
             self.email = check.str_param(email, "email")
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4487,6 +4784,7 @@ class GoogleSearchConsoleSource(GeneratedAirbyteSource):
 
 class FacebookMarketingSource(GeneratedAirbyteSource):
     class InsightConfig:
+        @public
         def __init__(
             self,
             name: str,
@@ -4511,6 +4809,7 @@ class FacebookMarketingSource(GeneratedAirbyteSource):
                 insights_lookback_window, "insights_lookback_window"
             )
 
+    @public
     def __init__(
         self,
         name: str,
@@ -4550,6 +4849,7 @@ class FacebookMarketingSource(GeneratedAirbyteSource):
 
 
 class SurveymonkeySource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self, name: str, access_token: str, start_date: str, survey_ids: Optional[List[str]] = None
     ):
@@ -4565,6 +4865,7 @@ class SurveymonkeySource(GeneratedAirbyteSource):
 
 
 class PardotSource(GeneratedAirbyteSource):
+    @public
     def __init__(
         self,
         name: str,
@@ -4592,6 +4893,7 @@ class PardotSource(GeneratedAirbyteSource):
 
 
 class FlexportSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, api_key: str, start_date: str):
         """
         Airbyte Source for Flexport
@@ -4604,6 +4906,7 @@ class FlexportSource(GeneratedAirbyteSource):
 
 
 class ZenefitsSource(GeneratedAirbyteSource):
+    @public
     def __init__(self, name: str, token: str):
         """
         Airbyte Source for Zenefits
@@ -4616,12 +4919,14 @@ class ZenefitsSource(GeneratedAirbyteSource):
 
 class KafkaSource(GeneratedAirbyteSource):
     class JSON:
+        @public
         def __init__(self, deserialization_type: Optional[str] = None):
             self.deserialization_type = check.opt_str_param(
                 deserialization_type, "deserialization_type"
             )
 
     class AVRO:
+        @public
         def __init__(
             self,
             deserialization_type: Optional[str] = None,
@@ -4647,31 +4952,37 @@ class KafkaSource(GeneratedAirbyteSource):
             )
 
     class ManuallyAssignAListOfPartitions:
+        @public
         def __init__(self, topic_partitions: str):
             self.subscription_type = "assign"
             self.topic_partitions = check.str_param(topic_partitions, "topic_partitions")
 
     class SubscribeToAllTopicsMatchingSpecifiedPattern:
+        @public
         def __init__(self, topic_pattern: str):
             self.subscription_type = "subscribe"
             self.topic_pattern = check.str_param(topic_pattern, "topic_pattern")
 
     class PLAINTEXT:
+        @public
         def __init__(self, security_protocol: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
 
     class SASLPLAINTEXT:
+        @public
         def __init__(self, security_protocol: str, sasl_mechanism: str, sasl_jaas_config: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
             self.sasl_mechanism = check.str_param(sasl_mechanism, "sasl_mechanism")
             self.sasl_jaas_config = check.str_param(sasl_jaas_config, "sasl_jaas_config")
 
     class SASLSSL:
+        @public
         def __init__(self, security_protocol: str, sasl_mechanism: str, sasl_jaas_config: str):
             self.security_protocol = check.str_param(security_protocol, "security_protocol")
             self.sasl_mechanism = check.str_param(sasl_mechanism, "sasl_mechanism")
             self.sasl_jaas_config = check.str_param(sasl_jaas_config, "sasl_jaas_config")
 
+    @public
     def __init__(
         self,
         name: str,
