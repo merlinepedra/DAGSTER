@@ -101,7 +101,6 @@ setup(
         "docker": ["docker"],
         "test": [
             "buildkite-test-collector ; python_version>='3.8'",
-            "coverage==5.3",
             "docker",
             "grpcio-tools>=1.32.0,<1.44.0",  # related to above grpcio pins
             "mock==3.0.5",
