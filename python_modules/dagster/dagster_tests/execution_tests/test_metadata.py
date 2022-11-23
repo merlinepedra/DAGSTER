@@ -199,8 +199,8 @@ def test_table_metadata_value_schema_inference():
         "foo",
         value=MetadataValue.table(
             records=[
-                TableRecord(name="foo", status=False),
-                TableRecord(name="bar", status=True),
+                TableRecord(dict(name="foo", status=False)),
+                TableRecord(dict(name="bar", status=True)),
             ],
         ),
     )
@@ -208,8 +208,8 @@ def test_table_metadata_value_schema_inference():
     schema = table_metadata_entry.entry_data.schema  # type: ignore
     assert isinstance(schema, TableSchema)
     assert schema.columns == [
-        TableColumn(name="name", type="string"),
-        TableColumn(name="status", type="bool"),
+        TableColumn(dict(name="name", type="string")),
+        TableColumn(dict(name="status", type="bool")),
     ]
 
 
