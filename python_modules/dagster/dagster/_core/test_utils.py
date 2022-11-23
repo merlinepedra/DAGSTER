@@ -28,7 +28,6 @@ from dagster._core.secrets import SecretsLoader
 from dagster._core.storage.pipeline_run import PipelineRun, PipelineRunStatus, RunsFilter
 from dagster._core.workspace.context import WorkspaceProcessContext
 from dagster._core.workspace.load_target import WorkspaceLoadTarget
-from dagster._daemon.controller import create_daemon_grpc_server_registry
 from dagster._legacy import ModeDefinition, composite_solid, pipeline, solid
 from dagster._serdes import ConfigurableClass
 from dagster._seven.compat.pendulum import create_pendulum_time, mock_pendulum_timezone
@@ -517,6 +516,8 @@ def create_test_daemon_workspace_context(
     instance: DagsterInstance,
 ):
     """Creates a DynamicWorkspace suitable for passing into a DagsterDaemon loop when running tests."""
+    from dagster._daemon.controller import create_daemon_grpc_server_registry
+
     configure_loggers()
     with create_daemon_grpc_server_registry(instance) as grpc_server_registry:
         with WorkspaceProcessContext(
