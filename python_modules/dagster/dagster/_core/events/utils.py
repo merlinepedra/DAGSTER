@@ -1,10 +1,12 @@
 from json import JSONDecodeError
+from typing import Any, List, Sequence
 
 import dagster._check as check
-from dagster._serdes import deserialize_json_to_dagster_namedtuple
+from dagster._core.events import DagsterEvent
+from dagster._serdes.serdes import deserialize_as
 
 
-def filter_dagster_events_from_cli_logs(log_lines):
+def filter_dagster_events_from_cli_logs(log_lines: Sequence[str]) -> Sequence[DagsterEvent[Any]]:
     """
     Filters the raw log lines from a dagster-cli invocation to return only the lines containing json.
 
@@ -15,11 +17,11 @@ def filter_dagster_events_from_cli_logs(log_lines):
      TODO: replace with reading event logs from the DB
 
     """
-    check.list_param(log_lines, "log_lines", str)
+    check.sequence_param(log_lines, "log_lines", str)
 
-    coalesced_lines = []
-    buffer = []
-    in_split_line = False
+    coalesced_lines: List[str] = []
+    buffer: List[str] = []
+    in_split_line: bool = False
     for line in log_lines:
         line = line.strip()
         if not in_split_line and line.startswith("{"):
@@ -35,10 +37,10 @@ def filter_dagster_events_from_cli_logs(log_lines):
                 buffer = []
                 in_split_line = False
 
-    events = []
+    events: List[DagsterEvent[Any]] = []
     for line in coalesced_lines:
         try:
-            events.append(deserialize_json_to_dagster_namedtuple(line))
+            events.append(deserialize_as(line, DagsterEvent[Any]))
         except JSONDecodeError:
             pass
         except check.CheckError:

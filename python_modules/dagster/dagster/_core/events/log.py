@@ -1,9 +1,9 @@
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, Dict, NamedTuple, Optional, TypeVar, Union
 
 import dagster._check as check
 from dagster._annotations import PublicAttr, public
 from dagster._core.errors import DagsterInvariantViolationError
-from dagster._core.events import DagsterEvent
+from dagster._core.events import DagsterEvent, EventSpecificData
 from dagster._core.utils import coerce_valid_log_level
 from dagster._serdes.serdes import (
     DefaultNamedTupleSerializer,
@@ -35,6 +35,7 @@ class EventLogEntrySerializer(DefaultNamedTupleSerializer):
         storage_dict["message"] = ""
         return storage_dict
 
+T_EventSpecificData = TypeVar("T_EventSpecificData", bound=EventSpecificData)
 
 @whitelist_for_serdes(serializer=EventLogEntrySerializer)
 class EventLogEntry(
@@ -48,9 +49,10 @@ class EventLogEntry(
             ("timestamp", PublicAttr[float]),
             ("step_key", PublicAttr[Optional[str]]),
             ("pipeline_name", Optional[str]),
-            ("dagster_event", PublicAttr[Optional[DagsterEvent]]),
+            ("dagster_event", PublicAttr[Optional[DagsterEvent[EventSpecificData]]),
         ],
-    )
+    ),
+    Generic[T_EventSpecificData],
 ):
     """Entries in the event log.
 
@@ -77,15 +79,15 @@ class EventLogEntry(
 
     def __new__(
         cls,
-        error_info,
-        level,
-        user_message,
-        run_id,
-        timestamp,
-        step_key=None,
-        pipeline_name=None,
-        dagster_event=None,
-        job_name=None,
+        error_info: Optional[SerializableErrorInfo],
+        level: Union[str, int],
+        user_message: str,
+        run_id: str,
+        timestamp: float,
+        step_key: Optional[str]=None,
+        pipeline_name: Optional[str]=None,
+        dagster_event: Optional[DagsterEvent[]=None,
+        job_name: Optional[str]=None,
     ):
         if pipeline_name and job_name:
             raise DagsterInvariantViolationError(
@@ -129,7 +131,7 @@ class EventLogEntry(
         return serialize_dagster_namedtuple(self)
 
     @staticmethod
-    def from_json(json_str):
+    def from_json(json_str: str):
         return deserialize_json_to_dagster_namedtuple(json_str)
 
     @public  # type: ignore

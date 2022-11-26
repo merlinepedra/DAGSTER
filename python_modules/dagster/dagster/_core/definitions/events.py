@@ -12,6 +12,7 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -100,7 +101,7 @@ class AssetKey(NamedTuple("_AssetKey", [("path", PublicAttr[Sequence[str]])])):
     def __hash__(self):
         return hash(tuple(self.path))
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, AssetKey):
             return False
         if len(self.path) != len(other.path):
@@ -205,7 +206,7 @@ DynamicAssetKey = Callable[["OutputContext"], Optional[AssetKey]]
 class AssetLineageInfo(
     NamedTuple("_AssetLineageInfo", [("asset_key", AssetKey), ("partitions", AbstractSet[str])])
 ):
-    def __new__(cls, asset_key, partitions=None):
+    def __new__(cls, asset_key: AssetKey, partitions: Optional[AbstractSet[str]]=None):
         asset_key = check.inst_param(asset_key, "asset_key", AssetKey)
         partitions = check.opt_set_param(partitions, "partitions", str)
         return super(AssetLineageInfo, cls).__new__(cls, asset_key=asset_key, partitions=partitions)
@@ -343,14 +344,16 @@ class DynamicOutput(Generic[T]):
         return self._output_name
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, DynamicOutput)
-            and self.value == other.value
-            and self.output_name == other.output_name
-            and self.mapping_key == other.mapping_key
-            and self.metadata_entries == other.metadata_entries
-        )
-
+        if not isinstance(other, DynamicOutput):
+            return False
+        else:
+            other = cast(DynamicOutput[object], other)
+            return (
+                self.value == other.value
+                and self.output_name == other.output_name
+                and self.mapping_key == other.mapping_key
+                and self.metadata_entries == other.metadata_entries
+            )
 
 @whitelist_for_serdes
 class AssetObservation(
@@ -393,7 +396,7 @@ class AssetObservation(
             check.inst_param(asset_key, "asset_key", AssetKey)
         elif isinstance(asset_key, str):
             asset_key = AssetKey(parse_asset_key_string(asset_key))
-        elif isinstance(asset_key, Sequence):
+        else:
             check.sequence_param(asset_key, "asset_key", of_type=str)
             asset_key = AssetKey(asset_key)
 
@@ -480,7 +483,7 @@ class AssetMaterialization(
             check.inst_param(asset_key, "asset_key", AssetKey)
         elif isinstance(asset_key, str):
             asset_key = AssetKey(parse_asset_key_string(asset_key))
-        elif isinstance(asset_key, Sequence):
+        else:
             check.sequence_param(asset_key, "asset_key", of_type=str)
             asset_key = AssetKey(asset_key)
 
@@ -554,10 +557,10 @@ class AssetMaterialization(
 
 class MaterializationSerializer(DefaultNamedTupleSerializer):
     @classmethod
-    def value_from_unpacked(cls, unpacked_dict, klass):
+    def value_from_unpacked(cls, unpacked_dict: Mapping[str, Any], klass: Type[T]) -> T:
         # override the default `from_storage_dict` implementation in order to skip the deprecation
         # warning for historical Materialization events, loaded from event_log storage
-        return Materialization(skip_deprecation_warning=True, **unpacked_dict)
+        return klass(skip_deprecation_warning=True, **unpacked_dict)
 
 
 @whitelist_for_serdes(serializer=MaterializationSerializer)
@@ -907,19 +910,15 @@ class ObjectStoreOperation(
     @classmethod
     def serializable(cls, inst, **kwargs):
         return cls(
-            **dict(
-                {
-                    "op": inst.op.value,
-                    "key": inst.key,
-                    "dest_key": inst.dest_key,
-                    "obj": None,
-                    "serialization_strategy_name": inst.serialization_strategy_name,
-                    "object_store_name": inst.object_store_name,
-                    "value_name": inst.value_name,
-                    "version": inst.version,
-                },
-                **kwargs,
-            )
+            op=inst.op.value,
+            key=inst.key,
+            dest_key=inst.dest_key,
+            obj=None,
+            serialization_strategy_name=inst.serialization_strategy_name,
+            object_store_name=inst.object_store_name,
+            value_name=inst.value_name,
+            version=inst.version,
+            **kwargs,
         )
 
 
@@ -938,7 +937,7 @@ class HookExecutionResult(
         return super(HookExecutionResult, cls).__new__(
             cls,
             hook_name=check.str_param(hook_name, "hook_name"),
-            is_skipped=cast(bool, check.opt_bool_param(is_skipped, "is_skipped", default=False)),
+            is_skipped=check.opt_bool_param(is_skipped, "is_skipped", default=False),
         )
 
 
