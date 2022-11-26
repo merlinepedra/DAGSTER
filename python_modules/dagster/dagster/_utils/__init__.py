@@ -28,6 +28,7 @@ from typing import (
     Iterator,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Tuple,
@@ -40,7 +41,7 @@ from typing import (
 from warnings import warn
 
 import packaging.version
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeGuard
 
 import dagster._check as check
 import dagster._seven as seven
@@ -672,3 +673,13 @@ def traced(func: T_Callable) -> T_Callable:
         return func(*args, **kwargs)
 
     return cast(T_Callable, inner)
+
+# This is needed for type narrowing, because `NamedTuple` is weird and its subclasses don't
+# actually inherit from it.
+def is_named_tuple_subclass(obj: object) -> TypeGuard[Type[NamedTuple]]:
+    return (
+        isinstance(obj, type)
+        and issubclass(obj, tuple)
+        and hasattr(obj, "_fields")
+        and hasattr(obj, "_field_types")
+    )
