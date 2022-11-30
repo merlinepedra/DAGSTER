@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import {useCodeLocationsStatus} from '../nav/useCodeLocationsStatus';
-
+import {useCodeLocationsStatus, CodeLocationStatusProvider} from './CodeLocationProvider';
 import {StatusAndMessage} from './DeploymentStatusType';
 import {useDaemonStatus} from './useDaemonStatus';
 
@@ -22,9 +21,18 @@ interface Props {
 }
 
 export const DeploymentStatusProvider: React.FC<Props> = (props) => {
-  const {children, include} = props;
+  const {include} = props;
+  const skipCodeLocations = !include.has('code-locations');
+  return (
+    <CodeLocationStatusProvider skip={skipCodeLocations}>
+      <DeploymentStatusProviderWrapped {...props} />
+    </CodeLocationStatusProvider>
+  );
+};
 
-  const codeLocations = useCodeLocationsStatus(!include.has('code-locations'));
+const DeploymentStatusProviderWrapped: React.FC<Props> = (props) => {
+  const {children, include} = props;
+  const codeLocations = useCodeLocationsStatus();
   const daemons = useDaemonStatus(!include.has('daemons'));
 
   const value = React.useMemo(() => ({codeLocations, daemons}), [daemons, codeLocations]);
