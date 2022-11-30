@@ -371,3 +371,33 @@ types = [
     GrapheneRepositoryLocation,
     GrapheneRepositoryOrError,
 ]
+
+
+class GrapheneCodeLocationStatusSubscriptionPayload(graphene.ObjectType):
+    locationEntries = non_null_list(GrapheneWorkspaceLocationEntry)
+
+    class Meta:
+        name = "CodeLocationStatusSubscriptionPayload"
+
+
+async def gen_code_location_status(graphene_info):
+    workspace_snapshot = graphene_info.context.get_workspace_snapshot()
+    yield GrapheneCodeLocationStatusSubscriptionPayload(
+        locationEntries=[
+            GrapheneWorkspaceLocationEntry(entry) for entry in workspace_snapshot.values()
+        ]
+    )
+    queue = asyncio.Queue()
+
+    # unnecssary, since we are just reading from the in memory store
+    # loop = asyncio.get_event_loop()
+    # def _enqueue(event, cursor):
+    #     loop.call_soon_threadsafe(queue.put_nowait, (event, cursor))
+
+    while True:
+        await queue.get()
+        yield GrapheneCodeLocationStatusSubscriptionPayload(
+            locationEntries=[
+                GrapheneWorkspaceLocationEntry(entry) for entry in workspace_snapshot.values()
+            ]
+        )

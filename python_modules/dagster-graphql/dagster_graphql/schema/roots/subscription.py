@@ -3,7 +3,12 @@ import graphene
 from dagster._core.storage.compute_log_manager import ComputeIOType
 
 from ...implementation.execution import gen_captured_log_data, gen_compute_logs, gen_events_for_run
-from ..external import GrapheneLocationStateChangeSubscription, gen_location_state_changes
+from ..external import (
+    GrapheneCodeLocationStatusSubscriptionPayload,
+    GrapheneLocationStateChangeSubscription,
+    gen_code_location_status,
+    gen_location_state_changes,
+)
 from ..logs.compute_logs import GrapheneCapturedLogs, GrapheneComputeIOType, GrapheneComputeLogFile
 from ..pipelines.subscription import GraphenePipelineRunLogsSubscriptionPayload
 from ..util import non_null_list
@@ -46,6 +51,10 @@ class GrapheneDagitSubscription(graphene.ObjectType):
         description="Retrieve real-time events when a location in the workspace undergoes a state change.",
     )
 
+    codeLocationStatus = graphene.Field(
+        graphene.NonNull(GrapheneCodeLocationStatusSubscriptionPayload),
+    )
+
     def subscribe_pipelineRunLogs(self, graphene_info, runId, cursor=None):
         return gen_events_for_run(graphene_info, runId, cursor)
 
@@ -57,3 +66,6 @@ class GrapheneDagitSubscription(graphene.ObjectType):
 
     def subscribe_locationStateChangeEvents(self, graphene_info):
         return gen_location_state_changes(graphene_info)
+
+    def subscribe_codeLocationStatus(self, graphene_info):
+        return gen_code_location_status(graphene_info)

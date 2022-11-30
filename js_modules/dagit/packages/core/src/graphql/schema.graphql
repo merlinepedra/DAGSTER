@@ -3535,9 +3535,14 @@ type DagitSubscription {
   Retrieve real-time events when a location in the workspace undergoes a state change.
   """
   locationStateChangeEvents: LocationStateChangeSubscription!
+  codeLocationStatus: CodeLocationStatusSubscriptionPayload!
 }
 
 enum ComputeIOType {
   STDOUT
   STDERR
+}
+
+type CodeLocationStatusSubscriptionPayload {
+  locationEntries: [WorkspaceLocationEntry!]!
 }
