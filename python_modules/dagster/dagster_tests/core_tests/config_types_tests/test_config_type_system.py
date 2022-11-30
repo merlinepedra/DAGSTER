@@ -31,10 +31,11 @@ from dagster._config import (
     process_config,
     validate_config,
 )
+from dagster._core.definitions.config import ConfigMapping
+from dagster._core.definitions.decorators.graph_decorator import graph
 from dagster._legacy import (
     ModeDefinition,
     PipelineDefinition,
-    composite_solid,
     execute_pipeline,
     execute_solid,
     pipeline,
@@ -573,29 +574,31 @@ def test_config_defaults():
         assert prev_sum == 6
         return prev_sum + _context.solid_config["sum"]
 
-    # addition_composite_solid
-    def addition_composite_solid_config_fn(config):
+    # addition_graph
+    def addition_graph_config_fn(config):
         child_config = {"config": {"sum": config["a"] + config["b"] + config["c"]}}
         return {"one": child_config, "two": child_config}
 
-    @composite_solid(
-        config_fn=addition_composite_solid_config_fn,
-        config_schema={
-            "a": Field(Int, is_required=False, default_value=1),
-            "b": Field(Int, is_required=False, default_value=2),
-            "c": Int,
-        },
+    @graph(
+        config=ConfigMapping(
+            config_fn=addition_graph_config_fn,
+            config_schema={
+                "a": Field(Int, is_required=False, default_value=1),
+                "b": Field(Int, is_required=False, default_value=2),
+                "c": Int,
+            },
+        )
     )
-    def addition_composite_solid():
+    def addition_graph():
         return one(two())
 
     @pipeline
     def addition_pipeline():
-        addition_composite_solid()
+        addition_graph()
 
     result = execute_pipeline(
         addition_pipeline,
-        {"solids": {"addition_composite_solid": {"config": {"c": 3}}}},
+        {"solids": {"addition_graph": {"config": {"c": 3}}}},
     )
 
     assert result.success
@@ -606,9 +609,11 @@ def test_config_with_and_without_config():
     def prefix_value(context, v):
         return "{prefix}{v}".format(prefix=context.solid_config["prefix"], v=v)
 
-    @composite_solid(
-        config_fn=lambda cfg: {"prefix_value": {"config": {"prefix": cfg["prefix"]}}},
-        config_schema={"prefix": Field(str, is_required=False, default_value="_id_")},
+    @graph(
+        config=ConfigMapping(
+            config_fn=lambda cfg: {"prefix_value": {"config": {"prefix": cfg["prefix"]}}},
+            config_schema={"prefix": Field(str, is_required=False, default_value="_id_")},
+        )
     )
     def prefix_id(val):
         return prefix_value(val)
