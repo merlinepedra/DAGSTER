@@ -33,15 +33,9 @@ from dagster._config import (
 )
 from dagster._core.definitions.config import ConfigMapping
 from dagster._core.definitions.decorators.graph_decorator import graph
-from dagster._legacy import (
-    ModeDefinition,
-    execute_pipeline,
-    execute_solid,
-    pipeline,
-    solid,
-)
 from dagster._core.definitions.graph_definition import GraphDefinition
 from dagster._core.definitions.job_definition import JobDefinition
+from dagster._legacy import ModeDefinition, execute_pipeline, execute_solid, pipeline, solid
 
 
 def test_noop_config():
