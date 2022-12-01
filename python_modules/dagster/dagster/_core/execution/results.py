@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 import dagster._check as check
-from dagster._core.definitions import GraphDefinition, Node, NodeHandle, PipelineDefinition
+from dagster._core.definitions import GraphDefinition, Node, NodeHandle, JobDefinition
 from dagster._core.definitions.utils import DEFAULT_OUTPUT
 from dagster._core.errors import DagsterInvariantViolationError
 from dagster._core.events import DagsterEvent, DagsterEventType
@@ -31,7 +31,7 @@ class GraphExecutionResult:
         self.container = check.inst_param(container, "container", GraphDefinition)
         self.event_list = check.list_param(event_list, "step_event_list", of_type=DagsterEvent)
         self.reconstruct_context = check.callable_param(reconstruct_context, "reconstruct_context")
-        self.pipeline_def = check.inst_param(pipeline_def, "pipeline_def", PipelineDefinition)
+        self.pipeline_def = check.inst_param(pipeline_def, "pipeline_def", JobDefinition)
         self.handle = check.opt_inst_param(handle, "handle", NodeHandle)
         self.output_capture = check.opt_dict_param(
             output_capture, "output_capture", key_type=StepOutputHandle
@@ -171,7 +171,7 @@ class PipelineExecutionResult(GraphExecutionResult):
         output_capture=None,
     ):
         self.run_id = check.str_param(run_id, "run_id")
-        check.inst_param(pipeline_def, "pipeline_def", PipelineDefinition)
+        check.inst_param(pipeline_def, "pipeline_def", JobDefinition)
 
         super(PipelineExecutionResult, self).__init__(
             container=pipeline_def.graph,
@@ -304,7 +304,7 @@ class OpExecutionResult:
         )
         self.reconstruct_context = check.callable_param(reconstruct_context, "reconstruct_context")
         self.output_capture = check.opt_dict_param(output_capture, "output_capture")
-        self.pipeline_def = check.inst_param(pipeline_def, "pipeline_def", PipelineDefinition)
+        self.pipeline_def = check.inst_param(pipeline_def, "pipeline_def", JobDefinition)
 
     @property
     def compute_input_event_dict(self):

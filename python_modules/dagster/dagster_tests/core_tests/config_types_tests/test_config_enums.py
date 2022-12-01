@@ -12,7 +12,7 @@ from dagster import (
 )
 from dagster._config import Enum as ConfigEnum
 from dagster._config.validate import validate_config
-from dagster._legacy import PipelineDefinition, execute_pipeline, pipeline, solid
+from dagster._legacy import JobDefinition, execute_pipeline, pipeline, solid
 
 
 def define_test_enum_type():
@@ -49,7 +49,7 @@ def test_enum_in_pipeline_execution():
         assert context.solid_config["enum_field"] == "ENUM_VALUE"
         called["yup"] = True
 
-    pipeline_def = PipelineDefinition(name="enum_in_pipeline", solid_defs=[config_me])
+    pipeline_def = JobDefinition(name="enum_in_pipeline", solid_defs=[config_me])
 
     result = execute_pipeline(
         pipeline_def,
@@ -92,7 +92,7 @@ def test_native_enum_dagster_enum():
         assert context.solid_config == NativeEnum.BAR
         called["yup"] = True
 
-    pipeline_def = PipelineDefinition(
+    pipeline_def = JobDefinition(
         name="native_enum_dagster_pipeline", solid_defs=[dagster_enum_me]
     )
 
@@ -110,7 +110,7 @@ def test_native_enum_dagster_enum_from_classmethod():
         assert context.solid_config == NativeEnum.BAR
         called["yup"] = True
 
-    pipeline_def = PipelineDefinition(
+    pipeline_def = JobDefinition(
         name="native_enum_dagster_pipeline", solid_defs=[dagster_enum_me]
     )
 

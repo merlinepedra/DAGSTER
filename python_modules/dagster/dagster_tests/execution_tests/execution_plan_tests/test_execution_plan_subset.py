@@ -5,7 +5,7 @@ from dagster._core.instance import DagsterInstance
 from dagster._legacy import (
     InputDefinition,
     OutputDefinition,
-    PipelineDefinition,
+    JobDefinition,
     lambda_solid,
     solid,
 )
@@ -20,7 +20,7 @@ def define_two_int_pipeline():
     def add_one(num):
         return num + 1
 
-    return PipelineDefinition(
+    return JobDefinition(
         name="pipeline_ints",
         solid_defs=[return_one, add_one],
         dependencies={"add_one": {"num": DependencyDefinition("return_one")}},
@@ -71,7 +71,7 @@ def test_execution_plan_two_outputs():
         yield Output(1, "num_one")
         yield Output(2, "num_two")
 
-    pipeline_def = PipelineDefinition(name="return_one_two_pipeline", solid_defs=[return_one_two])
+    pipeline_def = JobDefinition(name="return_one_two_pipeline", solid_defs=[return_one_two])
 
     execution_plan = create_execution_plan(pipeline_def)
 
@@ -102,7 +102,7 @@ def test_reentrant_execute_plan():
         assert context.get_tag("foo") == "bar"
         called["yup"] = True
 
-    pipeline_def = PipelineDefinition(name="has_tag_pipeline", solid_defs=[has_tag])
+    pipeline_def = JobDefinition(name="has_tag_pipeline", solid_defs=[has_tag])
     instance = DagsterInstance.ephemeral()
     execution_plan = create_execution_plan(pipeline_def)
     pipeline_run = instance.create_run_for_pipeline(

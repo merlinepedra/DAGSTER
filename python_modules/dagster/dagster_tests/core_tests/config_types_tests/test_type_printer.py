@@ -5,7 +5,7 @@ from dagster._config import (
     resolve_to_config_type,
     snap_from_config_type,
 )
-from dagster._legacy import PipelineDefinition, solid
+from dagster._legacy import JobDefinition, solid
 
 
 def assert_inner_types(parent_type, *dagster_types):
@@ -248,7 +248,7 @@ def define_solid_for_test_type(name, config):
 # launch in dagit with this command:
 # dagit -f test_type_printer.py -n define_test_type_pipeline
 def define_test_type_pipeline():
-    return PipelineDefinition(
+    return JobDefinition(
         name="test_type_pipeline",
         solid_defs=[
             define_solid_for_test_type("int_config", int),

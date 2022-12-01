@@ -35,7 +35,7 @@ from dagster._core.definitions.config import ConfigMapping
 from dagster._core.definitions.decorators.graph_decorator import graph
 from dagster._legacy import (
     ModeDefinition,
-    PipelineDefinition,
+    JobDefinition,
     execute_pipeline,
     execute_solid,
     pipeline,
@@ -691,7 +691,7 @@ def dummy_resource(config_schema=None):
 
 
 def test_wrong_resources():
-    pipeline_def = PipelineDefinition(
+    pipeline_def = JobDefinition(
         name="pipeline_test_multiple_context",
         mode_defs=[
             ModeDefinition(
@@ -785,7 +785,7 @@ def test_multilevel_default_handling():
     def has_default_value(context):
         assert context.solid_config == 234
 
-    pipeline_def = PipelineDefinition(
+    pipeline_def = JobDefinition(
         name="multilevel_default_handling", solid_defs=[has_default_value]
     )
 
@@ -805,7 +805,7 @@ def test_no_env_missing_required_error_handling():
     def required_int_solid(_context):
         pass
 
-    pipeline_def = PipelineDefinition(
+    pipeline_def = JobDefinition(
         name="no_env_missing_required_error", solid_defs=[required_int_solid]
     )
 
