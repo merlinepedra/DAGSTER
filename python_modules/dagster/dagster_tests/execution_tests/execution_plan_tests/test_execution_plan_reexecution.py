@@ -5,6 +5,8 @@ import pytest
 
 import dagster._check as check
 from dagster import DependencyDefinition, Int
+from dagster._core.definitions.graph_definition import GraphDefinition
+from dagster._core.definitions.job_definition import JobDefinition
 from dagster._core.definitions.pipeline_base import InMemoryPipeline
 from dagster._core.errors import (
     DagsterExecutionStepNotFoundError,
@@ -21,7 +23,6 @@ from dagster._core.test_utils import default_mode_def_for_test
 from dagster._legacy import (
     InputDefinition,
     OutputDefinition,
-    JobDefinition,
     execute_pipeline,
     lambda_solid,
     reexecute_pipeline,
@@ -42,13 +43,15 @@ def define_addy_pipeline(using_file_system=False):
         return num + 3
 
     pipeline_def = JobDefinition(
-        name="execution_plan_reexecution",
-        solid_defs=[add_one, add_two, add_three],
-        dependencies={
-            "add_two": {"num": DependencyDefinition("add_one")},
-            "add_three": {"num": DependencyDefinition("add_two")},
-        },
-        mode_defs=[default_mode_def_for_test] if using_file_system else None,
+        graph_def=GraphDefinition(
+            name="execution_plan_reexecution",
+            node_defs=[add_one, add_two, add_three],
+            dependencies={
+                "add_two": {"num": DependencyDefinition("add_one")},
+                "add_three": {"num": DependencyDefinition("add_two")},
+            },
+        ),
+        _mode_def=default_mode_def_for_test if using_file_system else None,
     )
     return pipeline_def
 

@@ -5,7 +5,9 @@ from dagster._config import (
     resolve_to_config_type,
     snap_from_config_type,
 )
-from dagster._legacy import JobDefinition, solid
+from dagster._core.definitions.graph_definition import GraphDefinition
+from dagster._core.definitions.job_definition import JobDefinition
+from dagster._legacy import solid
 
 
 def assert_inner_types(parent_type, *dagster_types):
@@ -249,24 +251,26 @@ def define_solid_for_test_type(name, config):
 # dagit -f test_type_printer.py -n define_test_type_pipeline
 def define_test_type_pipeline():
     return JobDefinition(
-        name="test_type_pipeline",
-        solid_defs=[
-            define_solid_for_test_type("int_config", int),
-            define_solid_for_test_type("list_of_int_config", [int]),
-            define_solid_for_test_type("nullable_list_of_int_config", Noneable([int])),
-            define_solid_for_test_type("list_of_nullable_int_config", [Noneable(int)]),
-            define_solid_for_test_type(
-                "nullable_list_of_nullable_int_config", Noneable([Noneable(int)])
-            ),
-            define_solid_for_test_type("simple_dict", {"int_field": int, "string_field": str}),
-            define_solid_for_test_type(
-                "dict_with_optional_field",
-                {
-                    "nullable_int_field": Noneable(int),
-                    "optional_int_field": Field(int, is_required=False),
-                    "string_list_field": [str],
-                },
-            ),
-            define_solid_for_test_type("nested_dict", {"nested": {"int_field": int}}),
-        ],
+        graph_def=GraphDefinition(
+            name="test_type_pipeline",
+            node_defs=[
+                define_solid_for_test_type("int_config", int),
+                define_solid_for_test_type("list_of_int_config", [int]),
+                define_solid_for_test_type("nullable_list_of_int_config", Noneable([int])),
+                define_solid_for_test_type("list_of_nullable_int_config", [Noneable(int)]),
+                define_solid_for_test_type(
+                    "nullable_list_of_nullable_int_config", Noneable([Noneable(int)])
+                ),
+                define_solid_for_test_type("simple_dict", {"int_field": int, "string_field": str}),
+                define_solid_for_test_type(
+                    "dict_with_optional_field",
+                    {
+                        "nullable_int_field": Noneable(int),
+                        "optional_int_field": Field(int, is_required=False),
+                        "string_list_field": [str],
+                    },
+                ),
+                define_solid_for_test_type("nested_dict", {"nested": {"int_field": int}}),
+            ],
+        )
     )

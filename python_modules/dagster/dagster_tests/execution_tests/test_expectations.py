@@ -1,7 +1,8 @@
 import pytest
 
 from dagster import DagsterEventType, DagsterInvariantViolationError, ExpectationResult
-from dagster._legacy import JobDefinition, execute_pipeline, solid
+from dagster._core.definitions.job_definition import JobDefinition
+from dagster._legacy import execute_pipeline, solid
 
 
 def expt_results_for_compute_step(result, solid_name):

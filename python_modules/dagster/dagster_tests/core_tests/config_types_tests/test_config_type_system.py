@@ -35,12 +35,13 @@ from dagster._core.definitions.config import ConfigMapping
 from dagster._core.definitions.decorators.graph_decorator import graph
 from dagster._legacy import (
     ModeDefinition,
-    JobDefinition,
     execute_pipeline,
     execute_solid,
     pipeline,
     solid,
 )
+from dagster._core.definitions.graph_definition import GraphDefinition
+from dagster._core.definitions.job_definition import JobDefinition
 
 
 def test_noop_config():
@@ -692,16 +693,16 @@ def dummy_resource(config_schema=None):
 
 def test_wrong_resources():
     pipeline_def = JobDefinition(
-        name="pipeline_test_multiple_context",
-        mode_defs=[
-            ModeDefinition(
-                resource_defs={
-                    "resource_one": dummy_resource(),
-                    "resource_two": dummy_resource(),
-                }
-            )
-        ],
-        solid_defs=[],
+        graph_def=GraphDefinition(
+            name="pipeline_test_multiple_context",
+            node_defs=[],
+        ),
+        _mode_def=ModeDefinition(
+            resource_defs={
+                "resource_one": dummy_resource(),
+                "resource_two": dummy_resource(),
+            }
+        ),
     )
 
     with pytest.raises(
@@ -786,7 +787,7 @@ def test_multilevel_default_handling():
         assert context.solid_config == 234
 
     pipeline_def = JobDefinition(
-        name="multilevel_default_handling", solid_defs=[has_default_value]
+        graph_def=GraphDefinition(name="multilevel_default_handling", node_defs=[has_default_value])
     )
 
     assert execute_pipeline(pipeline_def).success
@@ -806,7 +807,9 @@ def test_no_env_missing_required_error_handling():
         pass
 
     pipeline_def = JobDefinition(
-        name="no_env_missing_required_error", solid_defs=[required_int_solid]
+        graph_def=GraphDefinition(
+            name="no_env_missing_required_error", node_defs=[required_int_solid]
+        )
     )
 
     with pytest.raises(DagsterInvalidConfigError) as pe_info:

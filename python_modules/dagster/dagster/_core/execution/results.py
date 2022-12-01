@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 import dagster._check as check
-from dagster._core.definitions import GraphDefinition, Node, NodeHandle, JobDefinition
+from dagster._core.definitions import GraphDefinition, JobDefinition, Node, NodeHandle
 from dagster._core.definitions.utils import DEFAULT_OUTPUT
 from dagster._core.errors import DagsterInvariantViolationError
 from dagster._core.events import DagsterEvent, DagsterEventType
