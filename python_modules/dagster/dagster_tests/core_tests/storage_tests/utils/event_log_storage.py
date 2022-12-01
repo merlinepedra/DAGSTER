@@ -16,6 +16,7 @@ from dagster import (
     AssetMaterialization,
     AssetObservation,
     DagsterInstance,
+    DailyPartitionsDefinition,
     EventLogRecord,
     EventRecordsFilter,
     Field,
@@ -24,12 +25,16 @@ from dagster import (
     Output,
     RetryRequested,
     RunShardedEventsCursor,
+    StaticPartitionsDefinition,
+    JobDefinition,
 )
 from dagster import _check as check
 from dagster import _seven as seven
+from dagster import asset, define_asset_job, op, resource
 from dagster import asset, in_process_executor, job, op, resource
 from dagster._core.assets import AssetDetails
 from dagster._core.definitions import ExpectationResult
+from dagster._core.definitions.asset_graph import AssetGraph
 from dagster._core.definitions.dependency import NodeHandle
 from dagster._core.definitions.multi_dimensional_partitions import MultiPartitionKey
 from dagster._core.definitions.pipeline_base import InMemoryPipeline
@@ -50,12 +55,14 @@ from dagster._core.host_representation.origin import (
     ExternalRepositoryOrigin,
     InProcessRepositoryLocationOrigin,
 )
+from dagster._core.storage.event_log.base import EventLogStorage
 from dagster._core.storage.event_log import InMemoryEventLogStorage, SqlEventLogStorage
 from dagster._core.storage.event_log.migration import (
     EVENT_LOG_DATA_MIGRATIONS,
     migrate_asset_key_data,
 )
 from dagster._core.storage.event_log.sqlite.sqlite_event_log import SqliteEventLogStorage
+from dagster._core.storage.partition_status_cache import update_asset_status_cache_values
 from dagster._core.test_utils import create_run_for_test, instance_for_test
 from dagster._core.types.loadable_target_origin import LoadableTargetOrigin
 from dagster._core.utils import make_new_run_id
@@ -312,8 +319,21 @@ def cursor_datetime_args():
     yield datetime.datetime.now()
 
 
-def _execute_job_and_store_events(instance, storage, job, run_id):
-    result = job.execute_in_process(instance=instance, raise_on_error=False, run_id=run_id)
+def _execute_job_and_store_events(
+    instance: DagsterInstance,
+    storage: EventLogStorage,
+    job: JobDefinition,
+    run_id: Optional[str] = None,
+    asset_selection: Optional[Sequence[AssetKey]] = None,
+    partition_key: Optional[str] = None,
+):
+    result = job.execute_in_process(
+        instance=instance,
+        raise_on_error=False,
+        run_id=run_id,
+        asset_selection=asset_selection,
+        partition_key=partition_key,
+    )
     events = instance.all_logs(run_id=result.run_id)
     for event in events:
         storage.store_event(event)
@@ -2787,3 +2807,72 @@ class TestEventLogStorage:
                 ]
                 == 1
             )
+
+    def test_get_cached_partition_status_by_asset(self, storage, instance):
+        partitions_def = DailyPartitionsDefinition(start_date="2022-01-01")
+
+        @asset(partitions_def=partitions_def)
+        def asset1():
+            return 1
+
+        asset_graph = AssetGraph.from_assets([asset1])
+        asset_job = define_asset_job("asset_job").resolve([asset1], [])
+
+        with instance_for_test() as created_instance:
+            if not storage._instance:  # pylint: disable=protected-access
+                storage.register_instance(created_instance)
+
+            asset_records = list(created_instance.get_asset_records([AssetKey("asset1")]))
+            assert len(asset_records) == 0
+
+            run_id_1 = make_new_run_id()
+            with create_and_delete_test_runs(instance, [run_id_1]):
+                result = _execute_job_and_store_events(
+                    created_instance,
+                    storage,
+                    asset_job,
+                    run_id=run_id_1,
+                    partition_key="2022-02-01",
+                )
+                assert result.success
+
+            update_asset_status_cache_values(created_instance, asset_graph)
+            asset_records = list(created_instance.get_asset_records([AssetKey("asset1")]))
+            assert len(asset_records) == 1
+            cached_status = asset_records[0].asset_entry.cached_status
+            assert cached_status.materialized_partition_subsets
+            materialized_partition_subset = partitions_def.deserialize_subset(
+                cached_status.materialized_partition_subsets
+            )
+            assert len(materialized_partition_subset.key_ranges) == 1
+            assert materialized_partition_subset.key_ranges[0].start == "2022-02-01"
+            assert materialized_partition_subset.key_ranges[0].end == "2022-02-01"
+            assert cached_status.latest_storage_id
+            assert cached_status.partitions_def_id
+
+            static_partitions_def = StaticPartitionsDefinition(["a", "b", "c"])
+            asset1._partitions_def = static_partitions_def
+            asset_job = define_asset_job("asset_job").resolve([asset1], [])
+            asset_graph = AssetGraph.from_assets([asset1])
+            run_id_2 = make_new_run_id()
+            with create_and_delete_test_runs(instance, [run_id_2]):
+                result = _execute_job_and_store_events(
+                    created_instance,
+                    storage,
+                    asset_job,
+                    run_id=run_id_2,
+                    partition_key="a",
+                )
+                assert result.success
+            update_asset_status_cache_values(created_instance, asset_graph)
+
+            asset_records = list(created_instance.get_asset_records([AssetKey("asset1")]))
+            assert len(asset_records) == 1
+            cached_status = asset_records[0].asset_entry.cached_status
+            assert cached_status.materialized_partition_subsets
+            materialized_partition_subset = static_partitions_def.deserialize_subset(
+                cached_status.materialized_partition_subsets
+            )
+            assert "a" in materialized_partition_subset.get_partition_keys()
+            assert "b" not in materialized_partition_subset.get_partition_keys()
+            assert "c" not in materialized_partition_subset.get_partition_keys()
