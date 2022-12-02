@@ -7,6 +7,7 @@ from typing import (
     Any,
     DefaultDict,
     Dict,
+    Generic,
     Iterable,
     Iterator,
     List,
@@ -17,6 +18,7 @@ from typing import (
     Set,
     Tuple,
     Type,
+    TypeVar,
     Union,
     cast,
 )
@@ -105,14 +107,15 @@ class NodeInvocation(
             retry_policy=check.opt_inst_param(retry_policy, "retry_policy", RetryPolicy),
         )
 
+T_NodeDefinition = TypeVar("T_NodeDefinition", bound="NodeDefinition")
 
-class Node:
+class Node(Generic[T_NodeDefinition]):
     """
     Node invocation within a graph. Identified by its name inside the graph.
     """
 
     name: str
-    definition: "NodeDefinition"
+    definition: T_NodeDefinition
     graph_definition: "GraphDefinition"
     _additional_tags: Mapping[str, str]
     _hook_defs: AbstractSet[HookDefinition]
@@ -123,7 +126,7 @@ class Node:
     def __init__(
         self,
         name: str,
-        definition: "NodeDefinition",
+        definition: T_NodeDefinition,
         graph_definition: "GraphDefinition",
         tags: Optional[Mapping[str, str]] = None,
         hook_defs: Optional[AbstractSet[HookDefinition]] = None,
@@ -193,11 +196,11 @@ class Node:
             return f"graph '{self.name}'"
 
     @property
-    def input_dict(self):
+    def input_dict(self) -> Mapping[str, InputDefinition]:
         return self.definition.input_dict
 
     @property
-    def output_dict(self):
+    def output_dict(self) -> Mapping[str, OutputDefinition]:
         return self.definition.output_dict
 
     @property
@@ -392,7 +395,7 @@ class NodeHandle(
 
         return NodeHandle.from_path(self.path[len(ancestor.path) :])
 
-    def with_ancestor(self, ancestor: "NodeHandle") -> Optional["NodeHandle"]:
+    def with_ancestor(self, ancestor: "NodeHandle") -> "NodeHandle":
         """Returns a copy of the handle with an ancestor grafted on.
 
         Args:

@@ -283,7 +283,7 @@ class GraphDefinition(NodeDefinition):
         return True
 
     @property
-    def solids(self) -> Sequence[Node]:
+    def solids(self) -> Sequence[Node[NodeDefinition]]:
         return list(set(self._node_dict.values()))
 
     @property
@@ -295,14 +295,14 @@ class GraphDefinition(NodeDefinition):
         return self._node_defs
 
     @property
-    def solids_in_topological_order(self) -> Sequence[Node]:
+    def solids_in_topological_order(self) -> Sequence[Node[NodeDefinition]]:
         return self._nodes_in_topological_order
 
     def has_solid_named(self, name: str) -> bool:
         check.str_param(name, "name")
         return name in self._node_dict
 
-    def solid_named(self, name: str) -> Node:
+    def solid_named(self, name: str) -> Node[NodeDefinition]:
         check.str_param(name, "name")
         check.invariant(
             name in self._node_dict,
@@ -311,7 +311,7 @@ class GraphDefinition(NodeDefinition):
 
         return self._node_dict[name]
 
-    def get_solid(self, handle: NodeHandle) -> Node:
+    def get_solid(self, handle: NodeHandle) -> Node[NodeDefinition]:
         check.inst_param(handle, "handle", NodeHandle)
         current = handle
         lineage = []

@@ -190,14 +190,14 @@ def test_concat():
 
 def test_nothing_pipeline():
     res = execute_pipeline(nothing_pipeline)
-    assert res.result_for_solid("wait").output_value() is None
-    assert res.result_for_solid("done").output_value() == "done"
+    assert res.result_for_node("wait").output_value() is None
+    assert res.result_for_node("done").output_value() == "done"
 
 
 def test_nothing_int_pipeline():
     res = execute_pipeline(nothing_int_pipeline)
-    assert res.result_for_solid("wait_int").output_value() == 1
-    assert res.result_for_solid("done").output_value() == "done"
+    assert res.result_for_node("wait_int").output_value() == 1
+    assert res.result_for_node("done").output_value() == "done"
 
 
 def test_nullable_concat():
@@ -212,7 +212,7 @@ def test_concat_list():
 
 def test_sum_pipeline():
     res = execute_pipeline(sum_pipeline)
-    assert res.result_for_solid("sum_solid").output_value() == 6
+    assert res.result_for_node("sum_solid").output_value() == 6
 
 
 def test_repeat():

@@ -640,7 +640,7 @@ def test_config_with_and_without_config():
     )
 
     assert result.success
-    assert result.result_for_solid("print_value").output_value() == "_customprefix_12345"
+    assert result.result_for_node("print_value").output_value() == "_customprefix_12345"
 
     result_using_default = execute_pipeline(
         config_issue_pipeline,
@@ -648,7 +648,7 @@ def test_config_with_and_without_config():
     )
 
     assert result_using_default.success
-    assert result_using_default.result_for_solid("print_value").output_value() == "_id_12345"
+    assert result_using_default.result_for_node("print_value").output_value() == "_id_12345"
 
 
 def test_build_optionality():

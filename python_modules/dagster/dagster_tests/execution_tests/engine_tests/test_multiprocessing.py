@@ -41,7 +41,7 @@ from .retry_jobs import (
 def test_diamond_simple_execution():
     result = execute_pipeline(define_diamond_pipeline())
     assert result.success
-    assert result.result_for_solid("adder").output_value() == 11
+    assert result.result_for_node("adder").output_value() == 11
 
 
 def compute_event(result, solid_name):
@@ -60,7 +60,7 @@ def test_diamond_multi_execution():
         )
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 11
+        assert result.result_for_node("adder").output_value() == 11
 
 
 def test_explicit_spawn():
@@ -75,7 +75,7 @@ def test_explicit_spawn():
         )
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 11
+        assert result.result_for_node("adder").output_value() == 11
 
 
 @pytest.mark.skipif(os.name == "nt", reason="No forkserver on windows")
@@ -91,7 +91,7 @@ def test_forkserver_execution():
         )
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 11
+        assert result.result_for_node("adder").output_value() == 11
 
 
 @pytest.mark.skipif(os.name == "nt", reason="No forkserver on windows")
@@ -111,7 +111,7 @@ def test_forkserver_preload():
         )
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 11
+        assert result.result_for_node("adder").output_value() == 11
 
 
 def define_diamond_pipeline():
@@ -257,7 +257,7 @@ def test_solid_selection():
 
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 2
+        assert result.result_for_node("adder").output_value() == 2
 
 
 def define_subdag_pipeline():
@@ -345,7 +345,7 @@ def test_ephemeral_event_log():
         )
         assert result.success
 
-        assert result.result_for_solid("adder").output_value() == 11
+        assert result.result_for_node("adder").output_value() == 11
 
 
 @solid(
@@ -413,7 +413,7 @@ def test_failure_multiprocessing():
             raise_on_error=False,
         )
         assert not result.success
-        failure_data = result.result_for_solid("throw").failure_data
+        failure_data = result.result_for_node("throw").failure_data
         assert failure_data
         assert failure_data.error.cls_name == "Failure"
 
@@ -450,7 +450,7 @@ def test_crash_multiprocessing():
             raise_on_error=False,
         )
         assert not result.success
-        failure_data = result.result_for_solid("sys_exit").failure_data
+        failure_data = result.result_for_node("sys_exit").failure_data
         assert failure_data
         assert failure_data.error.cls_name == "ChildProcessCrashException"
 
@@ -504,7 +504,7 @@ def test_crash_hard_multiprocessing():
             raise_on_error=False,
         )
         assert not result.success
-        failure_data = result.result_for_solid("segfault_solid").failure_data
+        failure_data = result.result_for_node("segfault_solid").failure_data
         assert failure_data
         assert failure_data.error.cls_name == "ChildProcessCrashException"
 
